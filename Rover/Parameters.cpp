@@ -639,6 +639,10 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Path: mode_circle.cpp
     AP_SUBGROUPINFO(mode_circle, "CIRC", 57, ParametersG2, ModeCircle),
 
+    // @Group: MOT_STPR
+    // @Path: ../libraries/AR_Motors/AP_StepperCtrl.cpp
+    AP_SUBGROUPINFO(stepper_ctrl, "STPR_", 58, ParametersG2, AP_StepperCtrl),
+
     AP_GROUPEND
 };
 
@@ -681,7 +685,7 @@ ParametersG2::ParametersG2(void)
     beacon(),
 #endif
     wheel_rate_control(wheel_encoder),
-    motors(wheel_rate_control),
+    motors(wheel_rate_control, stepper_ctrl),
     attitude_control(),
     smart_rtl(),
 #if HAL_PROXIMITY_ENABLED

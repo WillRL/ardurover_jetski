@@ -130,8 +130,9 @@ const AP_Param::GroupInfo AP_MotorsUGV::var_info[] = {
     AP_GROUPEND
 };
 
-AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller) :
-    _rate_controller(rate_controller)
+AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_StepperCtrl& stepper_ctrl) :
+    _rate_controller(rate_controller),
+    _stepper_ctrl(stepper_ctrl)
 {
     AP_Param::setup_object_defaults(this, var_info);
     _singleton = this;
@@ -152,9 +153,11 @@ void AP_MotorsUGV::init(uint8_t frtype)
     // setup pwm type
     setup_pwm_type();
 
+    setup_stepper_ctrl();
+
     // set safety output
     setup_safety_output();
-
+    
 }
 
 bool AP_MotorsUGV::get_legacy_relay_index(int8_t &index1, int8_t &index2, int8_t &index3, int8_t &index4) const
@@ -584,7 +587,7 @@ void AP_MotorsUGV::setup_pwm_type()
     _motor_mask = 0;
 
     hal.rcout->set_dshot_esc_type(SRV_Channels::get_dshot_esc_type());
-
+    
     // work out mask of channels assigned to motors
     _motor_mask |= SRV_Channels::get_output_channel_mask(SRV_Channel::k_throttle);
     _motor_mask |= SRV_Channels::get_output_channel_mask(SRV_Channel::k_throttleLeft);
@@ -620,6 +623,16 @@ void AP_MotorsUGV::setup_pwm_type()
     default:
         // do nothing
         break;
+    }
+}
+
+// setup stepper steering
+void AP_MotorsUGV::setup_stepper_ctrl(){
+    // setup stepper control
+    if (_stepper_ctrl.is_active) {
+        // TODO: Move this to a more appropriate place, create own driver for analog encoder or make a generic one.
+        _encoder_analog_source = hal.analogin->channel(0);
+        hal.rcout->set_output_mode(SRV_Channels::get_output_channel_mask(SRV_Channel::k_steering), AP_HAL::RCOutput::MODE_PWM_BRUSHED);
     }
 }
 
@@ -797,6 +810,12 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     steering = constrain_float(steering, -4500.0f, 4500.0f);
 
     // always allow steering to move
+    // If stepper control is active, this means we are using speed control by adjusting PWM freq.
+    if (_stepper_ctrl.is_active) {
+        IGNORE_RETURN(_encoder_analog_source->set_pin(8));
+        _stepper_ctrl.setpoint = steering/100.0f;
+        _stepper_ctrl.update(_encoder_analog_source->voltage_latest() * (360.0f/6.6f) - 180);
+    };
     SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
 }
 

@@ -307,6 +307,7 @@ public:
     AP_WheelRateControl wheel_rate_control;
 
     // Motor library
+    AP_StepperCtrl stepper_ctrl;
     AP_MotorsUGV motors;
 
     // steering and throttle controller
