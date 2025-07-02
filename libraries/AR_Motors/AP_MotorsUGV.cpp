@@ -130,7 +130,7 @@ const AP_Param::GroupInfo AP_MotorsUGV::var_info[] = {
     AP_GROUPEND
 };
 
-AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_StepperCtrl& stepper_ctrl) :
+AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_StepperController& stepper_ctrl) :
     _rate_controller(rate_controller),
     _stepper_ctrl(stepper_ctrl)
 {
@@ -812,9 +812,13 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     // always allow steering to move
     // If stepper control is active, this means we are using speed control by adjusting PWM freq.
     if (_stepper_ctrl.is_active) {
-        IGNORE_RETURN(_encoder_analog_source->set_pin(8));
+         IGNORE_RETURN(_encoder_analog_source->set_pin(_stepper_ctrl.encoder_analog_pin));
         _stepper_ctrl.setpoint = steering/100.0f;
-        _stepper_ctrl.update(_encoder_analog_source->voltage_latest() * (360.0f/6.6f) - 180);
+        const float steering_meas = ((_encoder_analog_source->voltage_latest()/2.0f) * (360.0f/3.3f)) - 180.0f;
+        _stepper_ctrl.update(steering_meas);
+        // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f %f", steering_meas, _encoder_analog_source->voltage_latest());
+        // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ABS ANGLE: %f", _encoder_analog_source->voltage_latest()/2.0f * (360.0f/5.0f));
+        // _stepper_ctrl.update(((_encoder_analog_source->voltage_latest()/2) * (360.0f/5.0f)) - 180);
     };
     SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
 }

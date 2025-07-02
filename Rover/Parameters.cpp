@@ -640,8 +640,8 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(mode_circle, "CIRC", 57, ParametersG2, ModeCircle),
 
     // @Group: MOT_STPR
-    // @Path: ../libraries/AR_Motors/AP_StepperCtrl.cpp
-    AP_SUBGROUPINFO(stepper_ctrl, "STPR_", 58, ParametersG2, AP_StepperCtrl),
+    // @Path: ../libraries/AR_Motors/AP_StepperController.cpp
+    AP_SUBGROUPINFO(stepper_ctrl, "STPR_", 58, ParametersG2, AP_StepperController),
 
     AP_GROUPEND
 };
