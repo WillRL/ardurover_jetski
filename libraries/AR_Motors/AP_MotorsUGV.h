@@ -228,8 +228,6 @@ private:
     float   _mast_rotation;  // requested mast rotation input as a value in the range +- 100
     uint32_t _motor_mask;   // mask of motors configured with pwm_type
     frame_type _frame_type; // frame type requested at initialisation
-    // TODO: Move this to a more appropriate place, create own driver for analog encoder or make a generic one.
-    AP_HAL::AnalogSource *_encoder_analog_source;
 
     // omni variables
     float   _throttle_factor[AP_MOTORS_NUM_MOTORS_MAX];

@@ -13,9 +13,34 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AP_StepperEncoder_config.h"
+#include <AP_GenericEncoder/AP_GenericEncoder_config.h>
+#if AP_GENERICENCODER_ENABLED
+#if AP_GENERICENCODER_AS5600I2C_ENABLED
+#if AP_StepperEncoder_ENABLED
+
+#include "AP_StepperEncoder_AS5600I2C.h"
 #include <AP_HAL/AP_HAL.h>
-#include "AP_SteeringEncoder_AS5600I2C.h"
 #include <AP_HAL/utility/OwnPtr.h>
 #include <GCS_MAVLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
+
+AP_StepperEncoder_AS5600I2C::AP_StepperEncoder_AS5600I2C(AP_StepperEncoder &frontend) :
+  AP_StepperEncoder_Backend(frontend)
+{
+}
+
+void AP_StepperEncoder_AS5600I2C::init()
+{
+  _encoder.init(&_frontend.theta, &_frontend.omega, &_frontend.alpha, &_frontend.latest_measurement_time);
+}
+
+void AP_StepperEncoder_AS5600I2C::update()
+{
+  _encoder.update();
+}
+
+#endif //AP_StepperEncoder_ENABLED
+#endif //AP_GENERICENCODER_AS5600I2C_ENABLED
+#endif //AP_GENERICENCODER_ENABLED

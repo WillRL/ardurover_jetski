@@ -14,33 +14,34 @@
  */
 #pragma once
 
-#include "AP_SteeringEncoder_config.h"
+#include "AP_StepperEncoder_config.h"
 
-#if AP_STEERINGENCODER_ENABLED
+#if AP_StepperEncoder_ENABLED
+#include <AP_GenericEncoder/AP_GenericEncoder.h>
+#include "AP_StepperEncoder.h"
 
-#include "AP_SteeringEncoder.h"
-
-class AP_SteeringEncoder_Backend
+class AP_StepperEncoder_Backend
 {
 public:
     // constructor. This incorporates initialization as well.
-    AP_SteeringEncoder_Backend(AP_SteeringEncoder &frontend);
+    AP_StepperEncoder_Backend(AP_StepperEncoder &frontend);
 
-    // we declare a virtual destructor so that SteeringEncoder drivers can
+    // we declare a virtual destructor so that STEPPERENCODER drivers can
     // override with a custom destructor if need be
-    virtual ~AP_SteeringEncoder_Backend() {}
+    virtual ~AP_StepperEncoder_Backend(void) {};
 
     // initialization
-    virtual void init() {};
+    virtual void init();
 
     // update the state structure
-    virtual void update() {};
+    virtual void update();
     virtual void calibrate();
 
 protected:
 
-    AP_SteeringEncoder &_frontend;
+    AP_StepperEncoder &_frontend;
+    AP_GenericEncoder _encoder;
 
 };
 
-#endif  // AP_WINDVANE_ENABLED
+#endif  // AP_StepperEncoder_ENABLED

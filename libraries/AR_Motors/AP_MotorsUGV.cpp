@@ -15,8 +15,8 @@
 #include <AP_Math/AP_Math.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <GCS_MAVLink/GCS.h>
-#include "AP_MotorsUGV.h"
 #include <AP_Relay/AP_Relay.h>
+#include "AP_MotorsUGV.h"
 
 #define SERVO_MAX 4500  // This value represents 45 degrees and is just an arbitrary representation of servo max travel.
 
@@ -630,9 +630,8 @@ void AP_MotorsUGV::setup_pwm_type()
 void AP_MotorsUGV::setup_stepper_ctrl(){
     // setup stepper control
     if (_stepper_ctrl.is_active) {
-        // TODO: Move this to a more appropriate place, create own driver for analog encoder or make a generic one.
-        _encoder_analog_source = hal.analogin->channel(0);
         hal.rcout->set_output_mode(SRV_Channels::get_output_channel_mask(SRV_Channel::k_steering), AP_HAL::RCOutput::MODE_PWM_BRUSHED);
+        _stepper_ctrl.init();
     }
 }
 
@@ -812,10 +811,8 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     // always allow steering to move
     // If stepper control is active, this means we are using speed control by adjusting PWM freq.
     if (_stepper_ctrl.is_active) {
-         IGNORE_RETURN(_encoder_analog_source->set_pin(_stepper_ctrl.encoder_analog_pin));
         _stepper_ctrl.setpoint = steering/100.0f;
-        const float steering_meas = ((_encoder_analog_source->voltage_latest()/2.0f) * (360.0f/3.3f)) - 180.0f;
-        _stepper_ctrl.update(steering_meas);
+        _stepper_ctrl.update();
         // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f %f", steering_meas, _encoder_analog_source->voltage_latest());
         // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ABS ANGLE: %f", _encoder_analog_source->voltage_latest()/2.0f * (360.0f/5.0f));
         // _stepper_ctrl.update(((_encoder_analog_source->voltage_latest()/2) * (360.0f/5.0f)) - 180);

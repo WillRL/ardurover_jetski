@@ -13,27 +13,22 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AP_SteeringEncoder_config.h"
+#include "AP_StepperEncoder_config.h"
+#if AP_StepperEncoder_ENABLED
 
-#if AP_STEERINGENCODER_ENABLED
-
-#include "AP_SteeringEncoder.h"
-#include "AP_SteeringEncoder_Backend.h"
+#include "AP_StepperEncoder.h"
+#include "AP_StepperEncoder_Backend.h"
 
 #include <GCS_MAVLink/GCS.h>
 
 // base class constructor.
-AP_SteeringEncoder_Backend::AP_SteeringEncoder_Backend(AP_SteeringEncoder &frontend) :
+AP_StepperEncoder_Backend::AP_StepperEncoder_Backend(AP_StepperEncoder &frontend) :
         _frontend(frontend)
 {
 }
 
-// calibrate SteeringEncoder
-void AP_SteeringEncoder_Backend::calibrate()
-{
-    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "SteeringEncoder: No cal required");
-    _frontend._calibration.set_and_save(0);
-    return;
-}
+void AP_StepperEncoder_Backend::init() {};
+void AP_StepperEncoder_Backend::update() {};
+void AP_StepperEncoder_Backend::calibrate() {};
 
-#endif  // AP_WINDVANE_ENABLED
+#endif  // AP_StepperEncoder_ENABLED

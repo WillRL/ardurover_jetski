@@ -14,12 +14,16 @@
  */
 #pragma once
 
+#include "AP_GenericEncoder_config.h"
+#if AP_GENERICENCODER_ENABLED
+#if AP_GENERICENCODER_AS5600I2C_ENABLED
+
 #include "AP_GenericEncoder.h"
 #include <AP_HAL/I2CDevice.h>
 
 #define I2C_BUS 1
 #define AS5600_ADDRESS              0x36
-#define AS5600_ADC2RAD              (M_PI / 4096.0f)
+#define AS5600_ADC2RAD              (2 * M_PI / 4096.0f)
 
 #define AS5600_ZMCO_REG             0x00 // ZPOS and MPOS burn count
 #define AS5600_ZPOS_MSB_REG         0x01 // Start position MSB
@@ -48,7 +52,10 @@ public:
     ~AP_GenericEncoder_AS5600I2C(void) {};
 
     // initialization
-    void init(int address) override;
+    void init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos, float *_ptr_latest_measurement_time) override;
+    void init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos);
+    void init(float *_ptr_pos, float *_ptr_dt_pos);
+    void init(float *_ptr_pos);
 
     // update state
     void update() override;
@@ -70,3 +77,5 @@ private:
     AP_HAL::OwnPtr<AP_HAL::I2CDevice> _dev = nullptr;
 };
 
+#endif // AP_GENERICENCODER_AS5600I2C_ENABLED
+#endif // AP_GENERICENCODER_ENABLED

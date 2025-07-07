@@ -13,34 +13,47 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <AP_HAL/AP_HAL.h>
+#include "AP_GenericEncoder_config.h"
+#if AP_GENERICENCODER_ENABLED
+#if AP_GENERICENCODER_AS5600I2C_ENABLED
+
 #include "AP_GenericEncoder_AS5600I2C.h"
+#include <AP_HAL/AP_HAL.h>
 #include <AP_HAL/utility/OwnPtr.h>
 #include <GCS_MAVLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
 // constructor
-AP_GenericEncoder_AS5600I2C::AP_GenericEncoder_AS5600I2C()
-{
-    gcs().send_text(MAV_SEVERITY_INFO, "AP_WNDVN_AS5600I2C Constructed.");   
-}
+AP_GenericEncoder_AS5600I2C::AP_GenericEncoder_AS5600I2C() { };
 
 /*
    Initialize the AS5600 I2C device. This device only has one I2C address, so the address parameter is ignored.
 */
-void AP_GenericEncoder_AS5600I2C::init(int)
+void AP_GenericEncoder_AS5600I2C::init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos, float *_ptr_latest_measurement_time)
 {   
-    _dev = hal.i2c_mgr->get_device(I2C_BUS, AS5600_ADDRESS);
-
-
-    if (!_dev) {
-        hal.console->printf("No AP_GenericEncoder_AS5600I2C found.");
-        return;
+    _pos = _ptr_pos;
+    _dt_pos = _ptr_dt_pos;
+    _ddt_pos = _ptr_ddt_pos;
+    _latest_measurement_time = _ptr_latest_measurement_time;
+    
+    uint8_t recv = 0;
+    FOREACH_I2C(i) {
+        _dev = hal.i2c_mgr->get_device(i, AS5600_ADDRESS);
+        WITH_SEMAPHORE(_dev->get_semaphore());
+        if (_dev->read_registers(0, &recv, 1)){
+            hal.console->printf("Found AS5600 on bus %li address 0x%02x\n", i, AS5600_ADDRESS);
+            break;
+        } else {
+            _dev = nullptr;
+        } 
+    }
+    
+    if (!_dev){
+        hal.console->printf("Could not find AS5600");
     }
 
-    hal.console->printf("AP_GenericEncoder_AS5600I2C: Found on bus %u address 0x%02x",
-                        I2C_BUS, AS5600_ADDRESS);
+    
 
     
     // setup();
@@ -186,14 +199,16 @@ Update the encoder's position.
 */
 void AP_GenericEncoder_AS5600I2C::update_pos()
 {
-    _prev_measurement_time = _latest_measurement_time;
-    _prev_pos = _pos;
+    _dev->set_retries(10);
+    _prev_measurement_time = *_latest_measurement_time;
+    _prev_pos = *_pos;
 
     WITH_SEMAPHORE(_dev->get_semaphore());
 
     uint8_t msb = 0;
     int ret = _dev->read_registers(AS5600_ANGLE_MSB_REG, &msb, 1);
     if (!ret) {
+        hal.console->printf("Failed to get ret val\n");
         return;
     }
     uint8_t lsb = 0;
@@ -202,9 +217,9 @@ void AP_GenericEncoder_AS5600I2C::update_pos()
         return;
     }
     
-    _latest_measurement_time = AP_HAL::millis()/1000.0f;
-    _pos = ((msb << 8) | lsb) * AS5600_ADC2RAD;
-    
+    *_latest_measurement_time = AP_HAL::millis()/1000.0f;
+    *_pos = ((msb << 8) | lsb) * AS5600_ADC2RAD;
+    _dev->set_retries(2);
 }
 
 /*
@@ -212,9 +227,9 @@ Update the encoder's velocity.
 */
 void AP_GenericEncoder_AS5600I2C::update_velocity()
 {
-    _prev_dt_pos = _dt_pos;
-    float dpos = calc_abs_rotary_d_pos(_prev_pos, _pos);
-    _dt_pos = dpos / (_latest_measurement_time - _prev_measurement_time);
+    _prev_dt_pos = *_dt_pos;
+    float dpos = calc_abs_rotary_d_pos(*_pos, _prev_pos);
+    *_dt_pos = dpos / (*_latest_measurement_time - _prev_measurement_time);
 }
 
 /*
@@ -222,5 +237,9 @@ Update the encoder's acceleration.
 */
 void AP_GenericEncoder_AS5600I2C::update_acceleration()
 {
-    _ddt_pos = (_dt_pos - _prev_dt_pos) / (_latest_measurement_time - _prev_measurement_time);
+    *_ddt_pos = (*_dt_pos - _prev_dt_pos) / (*_latest_measurement_time - _prev_measurement_time);
 }
+
+
+#endif // AP_GENERICENCODER_AS5600I2C_ENABLED
+#endif // AP_GENERIC_ENCODER_ENABLED

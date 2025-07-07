@@ -23,35 +23,41 @@
 void setup();    // declaration of the setup() function
 void loop();     // declaration of the loop() function
 
+const AP_HAL::HAL& hal = AP_HAL::get_HAL(); // create an instance of the encoder
+AP_GenericEncoder_AS5600I2C encoder;
+AP_HAL::OwnPtr<AP_HAL::I2CDevice> _dev = nullptr;
+float pos;
+float dt_pos;
+float ddt_pos;
+float _latest_measurement_time;
 
-const AP_HAL::HAL& hal = AP_HAL::get_HAL();
-AP_GenericEncoder_AS5600I2C *encoder =  new AP_GenericEncoder_AS5600I2C(); // create an instance of the encoder
-
-float retvals[3]; // array to hold the returned values
 void setup() {
+    hal.scheduler->delay(5000);
     hal.console->printf("Starting AS5600I2C test\n");    // print a starting message
-    
+
+    uint8_t recv = 0;
+    FOREACH_I2C(i) {
+        hal.console->printf("Checking bus %li\n", i);
+        for(int address = 1; address < 127; address++ ){
+            _dev = hal.i2c_mgr->get_device(i, address);
+            WITH_SEMAPHORE(_dev->get_semaphore());
+            if (_dev->read_registers(0, &recv, 1)){
+                hal.console->printf("Found device on bus %li address 0x%02x\n", i, address);
+            } 
+        }
+    }
+
+    encoder.init(&pos, &dt_pos, &ddt_pos, &_latest_measurement_time);
 }
 
 // the loop function runs over and over again forever
 void loop()
 {   
-    try{
-        // encoder->update(); // update the encoder state
-        // encoder->read(retvals); // read the encoder values
-        // hal.console->printf("Position: %.2f, Velocity: %.2f, Acceleration: %.2f\n",
-        //                retvals[0], retvals[1], retvals[2]); // print the values to the console
-        // give a delay of 1000ms or 1s
-        hal.scheduler->delay(1000);
-    }
-    catch (const std::exception &exc){
-    // catch anything thrown within try block that derives from std::exception
-        hal.console->printf("Exception caught: %s\n", exc.what()); // print the exception message
-    }
-    catch (...){
-        hal.console->printf("Unknown exception caught\n"); // print a generic message for unknown exceptions
-    }
-    
+    encoder.update(); // update the encoder state
+    hal.console->printf("Position: %f, Velocity: %f, Acceleration: %f\n",
+                    pos*57.2958, dt_pos*57.2958, ddt_pos*57.2958); // print the values to the console
+    // give a delay of 1000ms or 1s
+    hal.scheduler->delay(1);
 }
 
 AP_HAL_MAIN();    // HAL Macro that declares the main function. For more info see <https://ardupilot.org/dev/docs/learning-ardupilot-the-example-sketches.html/>

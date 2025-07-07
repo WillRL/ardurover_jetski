@@ -24,6 +24,7 @@ def build(bld):
             'AP_IRLock',
             'PID',
             'AP_GenericEncoder',
+            'AP_StepperEncoder'
         ],
     )
 

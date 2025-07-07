@@ -18,15 +18,14 @@
 
 #if AP_GENERICENCODER_ENABLED
 
-
 class AP_GenericEncoder
 {
 public:
     // constructor. This incorporates initialization as well.
     AP_GenericEncoder();
-    virtual ~AP_GenericEncoder(void) {}
+    virtual ~AP_GenericEncoder(void) {};
 
-    virtual void init(int address);
+    virtual void init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos, float *_ptr_latest_measurement_time);
 
     // update state
     virtual void update();
@@ -35,24 +34,23 @@ public:
     virtual void update_acceleration();
     virtual void calibrate();
 
-    void read(float *retvals);
-
     
   protected:
     // latest values read in
     virtual void setup();
     
     // state variables
-    float _pos = 0;                       // position (m or rad)
-    float _dt_pos = 0;                     // velocity (m/s or rad/s)
-    float _ddt_pos = 0;                    // acceleration (m/s^2 or rad/s^2)
-    float _latest_measurement_time = 0;   // latest measurement time (s)
+    float *_pos = nullptr;                       // position (m or rad)
+    float *_dt_pos = nullptr;                     // velocity (m/s or rad/s)
+    float *_ddt_pos = nullptr;                    // acceleration (m/s^2 or rad/s^2)
+    float *_latest_measurement_time = nullptr;   // latest measurement time (s)
 
     float _prev_measurement_time = 0;     // previous time (s)
     float _prev_pos = 0;                  // previous position (m or rad)
     float _prev_dt_pos = 0;                // previous velocity (m/s or rad/s)
 
     static float calc_abs_rotary_d_pos(float old_angle, float new_angle);
+    static float round_to_decimal_place(float value, int decimals);
 };
 
 #endif  // AP_GENERICENCODER_ENABLED

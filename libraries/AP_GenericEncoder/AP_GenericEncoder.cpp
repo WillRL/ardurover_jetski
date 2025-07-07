@@ -14,31 +14,16 @@
  */
 
 #include "AP_GenericEncoder_config.h"
+#if AP_GENERICENCODER_ENABLED
+
 #include "AP_GenericEncoder.h"
 #include <cmath>
-
-#if AP_GENERICENCODER_ENABLED
+extern const AP_HAL::HAL& hal;
 
 AP_GenericEncoder::AP_GenericEncoder()
 {
-    // Initialize the position, velocity, and acceleration to zero
-    _pos = 0.0f;
-    _dt_pos = 0.0f;
-    _ddt_pos = 0.0f;
 }
 
-void AP_GenericEncoder::read(float *retvals)
-{
-    // Ensure retvals is not null
-    if (retvals == nullptr) {
-        return;
-    }
-
-    // Read the latest values into the provided array
-    retvals[0] = _pos;      // Position
-    retvals[1] = _dt_pos;    // Velocity
-    retvals[2] = _ddt_pos;   // Acceleration
-}
 
 /*
 https://stackoverflow.com/questions/50833008/detect-if-magnetic-encoder-passes-360-or-0-and-in-which-direction-roll-over-wra
@@ -48,6 +33,44 @@ float AP_GenericEncoder::calc_abs_rotary_d_pos(float new_angle, float old_angle)
 {
   float result = fmod((2 * M_PI + new_angle - old_angle), (2 * M_PI));
   return (result > M_PI) ? result - (2 * M_PI) : result;
+}
+
+float AP_GenericEncoder::round_to_decimal_place(float value, int decimals)
+{
+    int rounding = pow(10, decimals);
+    return round(value * rounding) / rounding;
+}
+
+void AP_GenericEncoder::init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos, float *_ptr_latest_measurement_time) 
+{
+    _pos = _ptr_pos;
+    _dt_pos = _ptr_dt_pos;
+    _ddt_pos = _ptr_ddt_pos;
+    _latest_measurement_time = _ptr_latest_measurement_time; 
+}
+
+void AP_GenericEncoder::update() {
+    // Default implementation (can be overridden)
+}
+
+void AP_GenericEncoder::update_pos() {
+    // Default implementation (can be overridden)
+}
+
+void AP_GenericEncoder::update_velocity() {
+    // Default implementation (can be overridden)
+}
+
+void AP_GenericEncoder::update_acceleration() {
+    // Default implementation (can be overridden)
+}
+
+void AP_GenericEncoder::calibrate() {
+    // Default implementation (can be overridden)
+}
+
+void AP_GenericEncoder::setup() {
+    // Default implementation (can be overridden)
 }
 
 #endif  // AP_GENERICENCODER_ENABLED

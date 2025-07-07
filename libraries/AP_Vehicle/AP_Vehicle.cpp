@@ -566,10 +566,13 @@ void AP_Vehicle::loop()
             GCS_SEND_TEXT(MAV_SEVERITY_INFO, "%s", banner_msg);
         }
     }
+    char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1] {};
     const uint32_t new_internal_errors = AP::internalerror().errors();
     if(_last_internal_errors != new_internal_errors) {
         LOGGER_WRITE_ERROR(LogErrorSubsystem::INTERNAL_ERROR, LogErrorCode::INTERNAL_ERRORS_DETECTED);
-        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "Internal Errors 0x%x", (unsigned)new_internal_errors);
+        AP::internalerror().errors_as_string((uint8_t*)buffer, ARRAY_SIZE(buffer));
+        
+        GCS_SEND_TEXT(MAV_SEVERITY_CRITICAL, "Internal errors 0x%x l:%u %s", (unsigned int)new_internal_errors, AP::internalerror().last_error_line(), buffer);
         _last_internal_errors = new_internal_errors;
     }
 }

@@ -22,13 +22,13 @@
 extern const AP_HAL::HAL& hal;
 
 const AP_Param::GroupInfo AP_StepperController::var_info[] = {
-    // @Param: STPR_STR
-    // @DisplayName: Stepper motor for steering
+    // @Param: STPR_EN
+    // @DisplayName: Enable stepper motor for steering
     // @Description: Allows stepper motor control for steering
     // @Values: 0:False,1:True
     // @User: Standard
     // @RebootRequired: True
-    AP_GROUPINFO("STR", 1, AP_StepperController, is_active, 0),
+    AP_GROUPINFO_FLAGS("EN", 1, AP_StepperController, is_active, 0, AP_PARAM_FLAG_ENABLE),
 
     // @Param: G_RATIO
     // @DisplayName: Stepper Motor Gear Ratio
@@ -49,25 +49,29 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("DIR_PIN", 4, AP_StepperController, _stepper_direction_pin, 108),
 
+    // @Param: MAX_FREQ
+    // @DisplayName: Stepper Direction Pin
+    // @Description: Pin used for stepper motor direction control. This pin is used to set the direction of the stepper motor when using it for steering. Select Main or Aux depending on TTL requrired for stepper driver.
+    // @Values: 0..40000
+    // @User: Standard
+    AP_GROUPINFO("MAX_FREQ", 5, AP_StepperController, _max_freq, 40000),
+
     // @Param: ENCDR_PIN
     // @DisplayName: Encoder Analog Pin
     // @Description: Analog pin used for the encoder input. Set and reboot before powering on stepper motor for the first time.
     // @Values: 8: 
     // @RebootRequired: True
     // @User: Standard
-    AP_GROUPINFO("ENCDR_PIN", 5, AP_StepperController, encoder_analog_pin, 8),
-
-    // @Param: LOOP_FREQ
-    // @DisplayName: Stepper Motor Loop Frequency
-    // @Description: The loop frequency for the stepper motor control. This is used to determine how often the control loop is updated.
-    // @Units: Hz
-    // @Range: 1 400
-    // @User: Advanced
-    AP_GROUPINFO("LOOP_FREQ", 6, AP_StepperController, _loop_freq, 400),
+    AP_SUBGROUPINFO(encoder_frontend, "ENC_",  6, AP_StepperController, AP_StepperEncoder),
 
     // @Param: PID_
     // @Path: ../PID/PID.cpp
-    AP_SUBGROUPINFO(_pid, "RAT_",  7, AP_StepperController, PID),
+    AP_SUBGROUPINFO(_pid_angle, "ANG_",  7, AP_StepperController, PID),
+
+    // @Param: PID_
+    // @Path: ../PID/PID.cpp
+    // AP_SUBGROUPINFO(_pid_rate, "RAT_",  8, AP_StepperController, PID),
+    
     
     
     AP_GROUPEND
@@ -78,31 +82,36 @@ AP_StepperController::AP_StepperController(){
     AP_Param::setup_object_defaults(this, var_info);
 }
 
-void AP_StepperController::update(float curr_state){
+void AP_StepperController::init(){
+    encoder_frontend.init();
+}
+
+void AP_StepperController::update(){
     // Calculate the next signal based on the setpoint and gear ratio
     // curr_state is the encoders current state. This is usually placed directly on the stepper motor shaft.
+    float curr_theta = encoder_frontend.theta * _rad2deg - 180.0f;
+    // float curr_omega = encoder_frontend.omega * (180/M_PI);
 
-    // Limit the loop frequency to smooth stepper motor jitters.
-    if (AP_HAL::millis() - _prev_time < 1/(_loop_freq) * 1000) {
-        return;
-    } else {
-        _prev_time = AP_HAL::millis(); // Update the previous time to the current time
-    }
 
+    _prev_time = AP_HAL::millis(); // Update the previous time to the current time
     // Requested angle from autopilot is for the steering angle. Convert this to stepper motor angle (Or encoder angle if the encoder is not on stepper shaft)
-    float stepper_setpoint = MAX(MIN(setpoint * _gear_ratio, 180), -180); // 180 is the hard limit as this only supports absolute encoders. (Otherwise state is loss on power down)
+    float setpoint_pos = MAX(MIN(setpoint * _gear_ratio, 180), -180); // 180 is the hard limit as this only supports absolute encoders. (Otherwise state is loss on power down)
     float stepper_min_max = _min_max * (float) _gear_ratio;
-    stepper_setpoint = MAX(MIN(stepper_setpoint, stepper_min_max), -stepper_min_max);
+    setpoint_pos = MAX(MIN(setpoint_pos, stepper_min_max), -stepper_min_max);
 
     // Obtain control signal.
-    float error = stepper_setpoint - curr_state;
-    float control_signal = _pid.get_pid(error, 1);
-    control_signal = MAX(MIN(control_signal, 40000), -40000); // Keep the control signal within frequency limits.
+    float error_pos = setpoint_pos - curr_theta;
+    float control_signal = _pid_angle.get_pid(error_pos, 1);
+    // float error_vel = setpoint_vel - curr_omega;
+    // float control_signal = _pid_rate.get_pid(error_vel, 1);
+
+    control_signal = MAX(MIN(control_signal, _max_freq), -_max_freq); // Keep the control signal within frequency limits.
 
     // Write direction and frequency.
     hal.gpio->pinMode(_stepper_direction_pin, HAL_GPIO_OUTPUT);
     hal.gpio->write(_stepper_direction_pin, signbit(control_signal));
     uint32_t motor_mask = SRV_Channels::get_output_channel_mask(SRV_Channel::k_steering);
     hal.rcout->set_freq(motor_mask, abs(control_signal));
-    GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ct: %0.3f st: %0.3f, sp:  %0.3f, e: %0.3f", control_signal, curr_state, stepper_setpoint, error);
+    GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ct: %0.3f st: %0.3f, sp:  %0.3f, e: %0.3f", control_signal, curr_theta, setpoint_pos, error_pos);
+    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "theta: %0.3f", curr_theta);
 }
