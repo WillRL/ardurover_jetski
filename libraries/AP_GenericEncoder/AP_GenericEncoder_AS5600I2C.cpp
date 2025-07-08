@@ -168,7 +168,7 @@ void AP_GenericEncoder_AS5600I2C::set_maximum_angle(uint32_t angle)
     int ret;
     uint16_t adc_value = angle/360 * 4096;
 
-    uint8_t msb = (adc_value >> 8) & 0xF;
+    uint8_t msb = (adc_value >> 8) & 0x0F;
     uint8_t lsb = adc_value & 0xFF;
 
     ret = _dev->write_register(AS5600_MANG_MSB_REG, msb);

@@ -51,6 +51,8 @@ public:
 
     static float calc_abs_rotary_d_pos(float old_angle, float new_angle);
     static float round_to_decimal_place(float value, int decimals);
+
+    int _direction;
 };
 
 #endif  // AP_GENERICENCODER_ENABLED

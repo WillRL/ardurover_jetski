@@ -811,6 +811,15 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     // always allow steering to move
     // If stepper control is active, this means we are using speed control by adjusting PWM freq.
     if (_stepper_ctrl.is_active) {
+        if (!_stepper_ctrl.disarm_pwr && !armed){
+            hal.gpio->pinMode(_stepper_ctrl.en_pin, HAL_GPIO_OUTPUT);
+            hal.gpio->write(_stepper_ctrl.en_pin, 1);
+            return;
+        }
+        
+        hal.gpio->pinMode(_stepper_ctrl.en_pin, HAL_GPIO_OUTPUT);
+        hal.gpio->write(_stepper_ctrl.en_pin, 0);
+        
         _stepper_ctrl.setpoint = steering/100.0f;
         _stepper_ctrl.update();
         // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f %f", steering_meas, _encoder_analog_source->voltage_latest());

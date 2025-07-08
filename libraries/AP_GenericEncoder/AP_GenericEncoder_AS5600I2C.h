@@ -53,9 +53,9 @@ public:
 
     // initialization
     void init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos, float *_ptr_latest_measurement_time) override;
-    void init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos);
-    void init(float *_ptr_pos, float *_ptr_dt_pos);
-    void init(float *_ptr_pos);
+    // void init(float *_ptr_pos, float *_ptr_dt_pos, float *_ptr_ddt_pos);
+    // void init(float *_ptr_pos, float *_ptr_dt_pos);
+    // void init(float *_ptr_pos);
 
     // update state
     void update() override;

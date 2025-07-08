@@ -23,6 +23,9 @@ class AP_StepperController {
         AP_Int8 is_active; // Boolean, if steering motor is a stepper motor.  
         
         AP_StepperEncoder encoder_frontend;
+        AP_Int8 en_pin;
+        AP_Int8 disarm_pwr;
+
     private:
         AP_Float _gear_ratio; // Gear ratio between stepper motor and steering angle.
         AP_Float _min_max; // Min/Max angle for the stepper motor.
@@ -32,4 +35,5 @@ class AP_StepperController {
         // PID _pid_rate;
         float _prev_time; // Previous time.
         float _rad2deg = (180/M_PI);
+        AP_Int8 _direction;
 };

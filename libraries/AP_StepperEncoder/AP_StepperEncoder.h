@@ -54,7 +54,6 @@ public:
     };
 
 private:
-
     // parameters
     AP_Int8 _encoder_type;                          // type of windvane being used
     AP_StepperEncoder_Backend *_driver;

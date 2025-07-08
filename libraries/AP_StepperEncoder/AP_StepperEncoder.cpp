@@ -31,9 +31,9 @@ extern const AP_HAL::HAL& hal;
 const AP_Param::GroupInfo AP_StepperEncoder::var_info[] = {
 
     // @Param: TYPE
-    // @DisplayName: Wind Vane Type
-    // @Description: Wind Vane type
-    // @Values: 0:None,1:Heading when armed,2:RC input offset heading when armed,3:Analog,4:NMEA,10:SITL true,11:SITL apparent
+    // @DisplayName: Encoder Type
+    // @Description: Encoder type
+    // @Values: 0:None, 1:AS5600I2C
     // @User: Standard
     // @RebootRequired: True
     AP_GROUPINFO_FLAGS("TYPE", 1, AP_StepperEncoder, _encoder_type, 0, AP_PARAM_FLAG_ENABLE),

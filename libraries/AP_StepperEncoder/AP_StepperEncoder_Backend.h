@@ -42,6 +42,7 @@ protected:
     AP_StepperEncoder &_frontend;
     AP_GenericEncoder _encoder;
 
+
 };
 
 #endif  // AP_StepperEncoder_ENABLED
