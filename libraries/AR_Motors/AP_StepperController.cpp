@@ -70,29 +70,21 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("DISARM_PWR", 7, AP_StepperController, disarm_pwr, 0),
 
-    // @Param: DIR
-    // @DisplayName: Positive Direction
-    // @Description: Set positive direction (Reverse)
-    // @Values: -1,1
-    // @User: Standard
-    // @RebootRequired: True
-    AP_GROUPINFO("DIR", 8, AP_StepperController, _direction, 1),
-
     // @Param: ENC_
     // @DisplayName: Encoder Type
     // @Description: Type of encoder to use
     // @Values: 1:AS5600 I2C 
     // @RebootRequired: True
     // @User: Standard
-    AP_SUBGROUPINFO(encoder_frontend, "ENC_",  9, AP_StepperController, AP_StepperEncoder),
+    AP_SUBGROUPINFO(encoder_frontend, "ENC_",  8, AP_StepperController, AP_StepperEncoder),
 
     // @Param: PID_
     // @Path: ../PID/PID.cpp
-    AP_SUBGROUPINFO(_pid_angle, "ANG_",  10, AP_StepperController, PID),
+    AP_SUBGROUPINFO(_pid_angle, "ANG_",  9, AP_StepperController, PID),
 
     // @Param: PID_
     // @Path: ../PID/PID.cpp
-    // AP_SUBGROUPINFO(_pid_rate, "RAT_",  11, AP_StepperController, PID),
+    // AP_SUBGROUPINFO(_pid_rate, "RAT_",  10, AP_StepperController, PID),
     
     AP_GROUPEND
 };
@@ -109,28 +101,37 @@ void AP_StepperController::init(){
 void AP_StepperController::update(){
     // Calculate the next signal based on the setpoint and gear ratio
     // curr_state is the encoders current state. This is usually placed directly on the stepper motor shaft.
-    float curr_theta = _direction * (encoder_frontend.theta * _rad2deg - 180.0f);
-    // float curr_omega = encoder_frontend.omega * (180/M_PI);
+    float curr_theta = encoder_frontend.theta * _rad2deg - 180.0f;
+    // float curr_omega = encoder_frontend.omega * _rad2deg;
+    // float dt = AP_HAL::millis() -  _prev_time; 
+    
 
-
-    _prev_time = AP_HAL::millis(); // Update the previous time to the current time
     // Requested angle from autopilot is for the steering angle. Convert this to stepper motor angle (Or encoder angle if the encoder is not on stepper shaft)
     float setpoint_pos = MAX(MIN(setpoint * _gear_ratio, 180), -180); // 180 is the hard limit as this only supports absolute encoders. (Not taking into wrapping of the angle)
     float stepper_min_max = _min_max * (float) _gear_ratio;
     setpoint_pos = MAX(MIN(setpoint_pos, stepper_min_max), -stepper_min_max);
 
     // Obtain control signal.
+    // Position control
     float error_pos = setpoint_pos - curr_theta;
     float control_signal = _pid_angle.get_pid(error_pos, 1);
-    // float error_vel = setpoint_vel - curr_omega;
-    // float control_signal = _pid_rate.get_pid(error_vel, 1); // current loop
-    control_signal = MAX(MIN(control_signal, _max_freq), -_max_freq);
 
+    // Velocity control
+    // float error_omega = setpoint_omega - curr_omega;
+    // float alpha = _pid_rate.get_pid(error_omega, 1);
+
+    // Adjust velocity based of acceleration from control (Gives us a slew rate)
+    // float control_signal = curr_omega + alpha * dt;
+    control_signal = MAX(MIN(control_signal, _max_freq), -_max_freq);
+    
     // Write direction and frequency.
     hal.gpio->pinMode(_stepper_direction_pin, HAL_GPIO_OUTPUT);
     hal.gpio->write(_stepper_direction_pin, signbit(control_signal));
     uint32_t motor_mask = SRV_Channels::get_output_channel_mask(SRV_Channel::k_steering);
     hal.rcout->set_freq(motor_mask, abs(control_signal));
-    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ct: %0.3f st: %0.3f, sp:  %0.3f, e: %0.3f", control_signal, curr_theta, setpoint_pos, error_pos);
-    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "theta: %0.3f", curr_theta);
+
+
+    _prev_time = AP_HAL::millis(); // Update the previous time to the current time
+    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "set_om: %0.3f set_al: %0.3f ct: %0.3f", setpoint_omega, alpha, control_signal);
+    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "err_pos: %0.3f err_ome: %0.3f", error_pos, error_omega);
 }

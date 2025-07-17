@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include <PID/PID.h>
+#include <Filter/SlewLimiter.h>
 #include <AP_StepperEncoder/AP_StepperEncoder.h>
 
 
@@ -32,8 +33,8 @@ class AP_StepperController {
         AP_Int8 _stepper_direction_pin;  // PWM output type.
         AP_Int32 _max_freq;
         PID _pid_angle;
-        // PID _pid_rate;
-        float _prev_time; // Previous time.
+        PID _pid_rate;
+        float _prev_control = 0;
+        float _prev_time = 0; // Previous time.
         float _rad2deg = (180/M_PI);
-        AP_Int8 _direction;
 };
