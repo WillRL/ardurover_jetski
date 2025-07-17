@@ -40,7 +40,7 @@ void AP_DAC_TIx3204::init(void)
     }
     dev = std::move(hal.i2c_mgr->get_device(params.bus, params.bus_address));
     if (!dev) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "TIx3204 device is null at %u:%", unsigned(params.bus), unsigned(params.bus_address));
+        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "TIx3204 device is null at %u:%u", unsigned(params.bus), unsigned(params.bus_address));
         return;
     }
 

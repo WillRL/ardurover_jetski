@@ -35,7 +35,7 @@ void AP_DAC_MCP40D1x::init(void)
     }
 
     if (!dev) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "MCP40D1x device is null at %u:%", unsigned(params.bus), unsigned(params.bus_address));
+        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "MCP40D1x device is null at %u:%u", unsigned(params.bus), unsigned(params.bus_address));
         return;
     }
 
