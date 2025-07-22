@@ -35,6 +35,9 @@ public:
 #if AP_DAC_MCP40D1X_ENABLED
         MCP40D1x   = 2,
 #endif
+#if AP_DAC_MCP47FXBXX_ENABLED
+        MCP47FxBxx   = 3,
+#endif
     };
 
     AP_Enum<Type> type;             // 0=disabled, others see frontend enum TYPE

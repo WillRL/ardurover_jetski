@@ -21,6 +21,9 @@
 #include "AP_DAC_Params.h"
 #include "AP_DAC_TIx3204.h"
 #include "AP_DAC_MCP40D1x.h"
+#include "AP_DAC_MCP47FxBxx.h"
+#include <AP_HAL/AP_HAL.h>
+extern const AP_HAL::HAL &hal;
 
 const AP_Param::GroupInfo AP_DAC::var_info[] = {
 
@@ -55,6 +58,11 @@ void AP_DAC::init()
             backends[i] = new AP_DAC_MCP40D1x(params[i]);
             break;
 #endif
+#if AP_DAC_MCP47FXBXX_ENABLED
+        case AP_DAC_Params::Type::MCP47FxBxx:
+            backends[i] = new AP_DAC_MCP47FxBxx(params[i]);
+            break;
+#endif
         case AP_DAC_Params::Type::NONE:
             break;
         }
@@ -62,6 +70,8 @@ void AP_DAC::init()
             backends[i]->init();
         }
     }
+
+    
 }
 
 /*

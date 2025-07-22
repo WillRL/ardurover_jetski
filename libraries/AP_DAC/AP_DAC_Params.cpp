@@ -35,14 +35,14 @@
 #endif
 
 #ifndef AP_DAC_DEFAULT_TYPE
-#define AP_DAC_DEFAULT_TYPE int8_t(Type::NONE)
+#define AP_DAC_DEFAULT_TYPE int8_t(Type::MCP47FxBxx)
 #endif
 
 const AP_Param::GroupInfo AP_DAC_Params::var_info[] = {
     // @Param: TYPE
     // @DisplayName: DAC Type
     // @Description: DAC Type
-    // @Values: 0:Disabled, 1:TIx3204, 2:MCP401x
+    // @Values: 0:Disabled, 1:TIx3204, 2:MCP401x, 3:MCP47FxBxx
     // @User: Standard
     // @RebootRequired: True
     AP_GROUPINFO_FLAGS("TYPE", 1, AP_DAC_Params, type, AP_DAC_DEFAULT_TYPE, AP_PARAM_FLAG_ENABLE),

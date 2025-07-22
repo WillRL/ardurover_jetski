@@ -43,8 +43,8 @@ public:
 
     static const struct AP_Param::GroupInfo var_info[];
 
-private:
     AP_DAC_Params params[AP_DAC_MAX_INSTANCES];
+private:
     AP_DAC_Backend *backends[AP_DAC_MAX_INSTANCES];
 };
 
