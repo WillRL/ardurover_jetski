@@ -64,7 +64,7 @@ void AP_StepperEncoder::init()
         
         #if AP_GENERICENCODER_AS5600I2C_ENABLED
         case Type::AS5600I2C:
-            _driver = new AP_StepperEncoder_AS5600I2C(*this);
+            _driver = NEW_NOTHROW AP_StepperEncoder_AS5600I2C(*this);
             // hal.console->printf("Init AS5600");
             _driver->init();
             return; 

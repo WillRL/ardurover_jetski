@@ -71,11 +71,7 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     AP_GROUPINFO("DISARM_PWR", 7, AP_StepperController, disarm_pwr, 0),
 
     // @Param: ENC_
-    // @DisplayName: Encoder Type
-    // @Description: Type of encoder to use
-    // @Values: 1:AS5600 I2C 
-    // @RebootRequired: True
-    // @User: Standard
+    // @Path: ../AP_StepperEncoder/AP_StepperEncoder.cpp
     AP_SUBGROUPINFO(encoder_frontend, "ENC_",  8, AP_StepperController, AP_StepperEncoder),
 
     // @Param: PID_
@@ -90,7 +86,8 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
 };
 
 // Constructor
-AP_StepperController::AP_StepperController(){
+AP_StepperController::AP_StepperController()
+{
     AP_Param::setup_object_defaults(this, var_info);
 }
 

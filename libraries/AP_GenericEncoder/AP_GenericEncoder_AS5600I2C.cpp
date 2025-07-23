@@ -45,12 +45,8 @@ void AP_GenericEncoder_AS5600I2C::init(float *_ptr_pos, float *_ptr_dt_pos, floa
             hal.console->printf("Found AS5600 on bus %li address 0x%02x\n", i, AS5600_ADDRESS);
             break;
         } else {
-            _dev = nullptr;
+            hal.console->printf("Could not find AS5600");
         } 
-    }
-    
-    if (!_dev){
-        hal.console->printf("Could not find AS5600");
     }
 
     
@@ -208,7 +204,6 @@ void AP_GenericEncoder_AS5600I2C::update_pos()
     uint8_t msb = 0;
     int ret = _dev->read_registers(AS5600_ANGLE_MSB_REG, &msb, 1);
     if (!ret) {
-        hal.console->printf("Failed to get ret val\n");
         return;
     }
     uint8_t lsb = 0;

@@ -23,6 +23,8 @@
 #include "AP_DAC_MCP40D1x.h"
 #include "AP_DAC_MCP47FxBxx.h"
 #include <AP_HAL/AP_HAL.h>
+
+#include <GCS_MAVLink/GCS.h>
 extern const AP_HAL::HAL &hal;
 
 const AP_Param::GroupInfo AP_DAC::var_info[] = {
@@ -50,17 +52,17 @@ void AP_DAC::init()
         switch (type) {
 #if AP_DAC_TIX3204_ENABLED
         case AP_DAC_Params::Type::TIx3204:
-            backends[i] = new AP_DAC_TIx3204(params[i]);
+            backends[i] = NEW_NOTHROW AP_DAC_TIx3204(params[i]);
             break;
 #endif
 #if AP_DAC_MCP40D1X_ENABLED
         case AP_DAC_Params::Type::MCP40D1x:
-            backends[i] = new AP_DAC_MCP40D1x(params[i]);
+            backends[i] = NEW_NOTHROW AP_DAC_MCP40D1x(params[i]);
             break;
 #endif
 #if AP_DAC_MCP47FXBXX_ENABLED
         case AP_DAC_Params::Type::MCP47FxBxx:
-            backends[i] = new AP_DAC_MCP47FxBxx(params[i]);
+            backends[i] = NEW_NOTHROW AP_DAC_MCP47FxBxx(params[i]);
             break;
 #endif
         case AP_DAC_Params::Type::NONE:
@@ -85,6 +87,7 @@ bool AP_DAC::set_voltage(uint8_t instance, uint8_t channel, float voltage)
     if (backends[instance] == nullptr) {
         return false;
     }
+    
     return backends[instance]->set_voltage(channel, voltage);
 }
 
