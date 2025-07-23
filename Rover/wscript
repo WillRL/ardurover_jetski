@@ -25,7 +25,8 @@ def build(bld):
             'PID',
             'AP_GenericEncoder',
             'AP_StepperEncoder',
-            'AP_DAC'
+            'AP_DAC',
+            'AP_AnalogOutput'
         ],
     )
 

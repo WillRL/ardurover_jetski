@@ -35,7 +35,7 @@
 #endif
 
 #ifndef AP_DAC_DEFAULT_TYPE
-#define AP_DAC_DEFAULT_TYPE int8_t(Type::MCP47FxBxx)
+#define AP_DAC_DEFAULT_TYPE int8_t(Type::NONE)
 #endif
 
 const AP_Param::GroupInfo AP_DAC_Params::var_info[] = {

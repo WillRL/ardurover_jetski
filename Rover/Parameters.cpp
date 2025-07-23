@@ -639,9 +639,17 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Path: mode_circle.cpp
     AP_SUBGROUPINFO(mode_circle, "CIRC", 57, ParametersG2, ModeCircle),
 
-    // @Group: MOT_STPR
+    // @Group: STPR_
     // @Path: ../libraries/AR_Motors/AP_StepperController.cpp
     AP_SUBGROUPINFO(stepper_ctrl, "STPR_", 58, ParametersG2, AP_StepperController),
+
+    // @Group: AOUT_
+    // @Path: ../libraries/AR_Motors/AP_StepperController.cpp
+    AP_SUBGROUPINFO(analogoutput, "AOUT_", 59, ParametersG2, AP_AnalogOutput),
+
+    // @Group: DAC_
+    // @Path: ../libraries/AR_Motors/AP_StepperController.cpp
+    AP_SUBGROUPINFO(dac, "DAC_", 60, ParametersG2, AP_DAC),
 
     AP_GROUPEND
 };
@@ -685,7 +693,8 @@ ParametersG2::ParametersG2(void)
     beacon(),
 #endif
     wheel_rate_control(wheel_encoder),
-    motors(wheel_rate_control, stepper_ctrl),
+    analogoutput(dac),
+    motors(wheel_rate_control, stepper_ctrl, analogoutput),
     attitude_control(),
     smart_rtl(),
 #if HAL_PROXIMITY_ENABLED

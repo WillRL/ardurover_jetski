@@ -130,9 +130,10 @@ const AP_Param::GroupInfo AP_MotorsUGV::var_info[] = {
     AP_GROUPEND
 };
 
-AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_StepperController& stepper_ctrl) :
+AP_MotorsUGV::AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_StepperController& stepper_ctrl, AP_AnalogOutput& analogoutput) :
     _rate_controller(rate_controller),
-    _stepper_ctrl(stepper_ctrl)
+    _stepper_ctrl(stepper_ctrl),
+    _analogoutput(analogoutput)
 {
     AP_Param::setup_object_defaults(this, var_info);
     _singleton = this;
@@ -154,6 +155,8 @@ void AP_MotorsUGV::init(uint8_t frtype)
     setup_pwm_type();
 
     setup_stepper_ctrl();
+
+    _analogoutput.init();
 
     // set safety output
     setup_safety_output();
@@ -791,6 +794,12 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                 steering *= -1.0f;
             }
         }
+        if (_analogoutput.is_active){
+            _analogoutput.command.throttle = throttle;
+            _analogoutput.command.steering = steering;
+            _analogoutput.update();
+        }
+        
         output_throttle(SRV_Channel::k_throttle, throttle);
     } else {
         // handle disarmed case

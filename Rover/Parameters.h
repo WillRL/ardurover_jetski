@@ -14,6 +14,7 @@
 #include <AP_Stats/AP_Stats.h>
 #include "AP_Torqeedo/AP_Torqeedo.h"
 #include <AP_WindVane/AP_WindVane.h>
+#include <AP_DAC/AP_DAC.h>
 
 #define AP_PARAM_VEHICLE_NAME rover
 
@@ -308,6 +309,8 @@ public:
 
     // Motor library
     AP_StepperController stepper_ctrl;
+    AP_DAC dac;
+    AP_AnalogOutput analogoutput;
     AP_MotorsUGV motors;
 
     // steering and throttle controller

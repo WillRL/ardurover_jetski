@@ -4,11 +4,12 @@
 #include <AP_WheelEncoder/AP_WheelRateControl.h>
 #include <SRV_Channel/SRV_Channel.h>
 #include "AP_StepperController.h"
+#include <AP_AnalogOutput/AP_AnalogOutput.h>
 
 class AP_MotorsUGV {
 public:
     // Constructor
-    AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_StepperController& stepper_ctrl);
+    AP_MotorsUGV(AP_WheelRateControl& rate_controller, AP_StepperController& stepper_ctrl, AP_AnalogOutput& analogoutput);
 
     // singleton support
     static AP_MotorsUGV    *get_singleton(void) { return _singleton; }
@@ -250,6 +251,9 @@ private:
 
     // stepper motor control
     AP_StepperController &_stepper_ctrl;
+
+    // AnalogOutput
+    AP_AnalogOutput &_analogoutput;
 };
 
 namespace AP {
