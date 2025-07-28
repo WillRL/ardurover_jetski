@@ -17,14 +17,17 @@
 */
 #include <AP_Common/AP_Common.h>
 #include <AP_HAL/AP_HAL.h>
-#include <AP_DAC/AP_DAC.h>
+#include <AP_DAC/AP_DAC_Params.h>
+#include <AP_DAC/AP_DAC_MCP47FxBxx.h>
 #include <AP_HAL/I2CDevice.h>
 
 void setup();    // declaration of the setup() function
 void loop();     // declaration of the loop() function
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL(); // create an instance of the dac
-AP_DAC dac;
+AP_DAC_Params params;
+AP_DAC_MCP47FxBxx dac(params);
+
 AP_HAL::OwnPtr<AP_HAL::I2CDevice> _dev = nullptr;
 namespace {
 // try to set the object value but provide diagnostic if it failed
@@ -43,21 +46,9 @@ void set_object_value(const void *object_pointer,
 void setup() {
     hal.scheduler->delay(5000);
     hal.console->printf("Initialising MCP47FxBxx test\nDoing I2C bus scan...\n");    // print a starting message
-
-    uint8_t recv = 0;
-    FOREACH_I2C(i) {
-        hal.console->printf("Checking bus %li\n", i);
-        for(int address = 1; address < 127; address++ ){
-            _dev = hal.i2c_mgr->get_device(i, address);
-            WITH_SEMAPHORE(_dev->get_semaphore());
-            if (_dev->read_registers(0, &recv, 1)){
-                hal.console->printf("Found device on bus %li address 0x%02x\n", i, address);
-            } 
-        }
-    }
     
-    set_object_value(&dac.params[0], dac.params[0].var_info, "TYPE", 3);
-    set_object_value(&dac.params[0], dac.params[0].var_info, "VREF", 5);
+    set_object_value(&params, params.var_info, "TYPE", 3);
+    set_object_value(&params, params.var_info, "VREF", 5);
     dac.init();
     hal.scheduler->delay(5000);
     hal.console->printf("Starting MCP47FxBxx test\n");    // print a starting message
@@ -66,15 +57,36 @@ void setup() {
 
 // the loop function runs over and over again forever
 float voltage = 0;
+bool chan0;
+bool chan1;
+bool chan2;
+bool chan3;
+uint16_t por;
+uint16_t eewa;
+uint16_t wiperlock;
+int delay = 10; // 10
+int count = 0;
 void loop()
 {   
     voltage = sin(10*AP_HAL::millis()/1000.0f) * 2.5 + 2.5;
-    dac.set_voltage(0, 0, voltage);
-    dac.set_voltage(0, 1, voltage);
-    dac.set_voltage(0, 2, voltage);
-    dac.set_voltage(0, 3, voltage);
-    hal.console->printf("voltage: %f\n", voltage);
-    hal.scheduler->delay(1);
+    chan0 = dac.set_voltage(0, voltage);
+    // hal.scheduler->delay(delay);
+    chan1 = dac.set_voltage(1, voltage);
+    // hal.scheduler->delay(delay);
+    chan2 = dac.set_voltage(2, voltage);
+    // hal.scheduler->delay(delay);
+    chan3 = dac.set_voltage(3, voltage);
+    // hal.scheduler->delay(delay);
+    count++;
+    
+
+    hal.console->printf("set: %i%i%i%i-%i\n", chan0, chan1, chan2, chan3, count);
+    if (!(chan0 & chan1 & chan2 & chan3)){
+        hal.console->printf("Failed setting channels. Resetting count.\n");
+        hal.scheduler->delay(10000);
+        count = 0;
+    }
+    // hal.scheduler->delay(100);
 }
 
 AP_HAL_MAIN();    // HAL Macro that declares the main function. For more info see <https://ardupilot.org/dev/docs/learning-ardupilot-the-example-sketches.html/>

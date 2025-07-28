@@ -1,5 +1,5 @@
 /*
- *  RangeFinder test code
+ *  Stepper Encoder Test Code
  */
 
 #include <AP_HAL/AP_HAL.h>
