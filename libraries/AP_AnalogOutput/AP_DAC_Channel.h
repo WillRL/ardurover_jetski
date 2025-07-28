@@ -29,13 +29,9 @@ public:
 
 private:
     uint8_t _chan;
-    // float_t _ratio;
-    // float_t _voltage_min;
-    // float_t _voltage_max;
     AP_AnalogOutput &_frontend;
     
     float _convert_command();
-    static float _minmax[]; // index corresponds to expected min max from ardupilot code for each tyoe. (Index 0 is NONE, index 1 is THROTTLE etc.)
     static float _normalise(float val, float min_old, float max_old, float min_new, float max_new);
 };
 

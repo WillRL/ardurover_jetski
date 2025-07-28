@@ -25,11 +25,13 @@ public:
     static const struct AP_Param::GroupInfo var_info[];
     // DAC types
     enum class Type : uint8_t {
-        NONE        = 0,
-        THROTTLE    = 1,
-        REVERSE     = 2,
+        NONE            = 0,
+        THROTTLE        = 1,
+        THROTTLE_ABS    = 2,
+        REVERSE         = 3,
+        STEERING        = 4,
     };
-    AP_Enum<Type> type;             // 0=disabled, others see frontend enum TYPE
+    AP_Enum<Type> binding;             // 0=disabled, others see frontend enum TYPE
     AP_Int8 enabled;
 
 private:

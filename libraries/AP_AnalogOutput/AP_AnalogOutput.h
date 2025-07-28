@@ -18,7 +18,10 @@ class AP_AnalogOutput {
 
         void init();
         
-        void update();
+        bool update();
+        // bool restart_dac();
+        // AP_DAC *get_dac();
+        
 
         AP_Int8 is_active; // Boolean, if analog output is enabled.
         struct Commands {
@@ -28,7 +31,9 @@ class AP_AnalogOutput {
 
         Commands command;
 
-    private:
+        AP_DAC_Channel_Params *get_param(int channel);
+        
+        private:
         AP_DAC& _dac;
         AP_DAC_Channel* _channels[8];
         AP_DAC_Channel_Params _params[8];

@@ -4,7 +4,6 @@
 #include <cmath>
 
 extern const AP_HAL::HAL& hal;
-float AP_DAC_Channel::_minmax[] = {0.0f, 100.0f, 100.0f};
 
 // base class constructor.
 AP_DAC_Channel::AP_DAC_Channel(AP_AnalogOutput &frontend, uint8_t chan) :
@@ -26,15 +25,17 @@ float AP_DAC_Channel::_convert_command()
     float_t _ratio = _frontend._params[_chan]._ratio.get();
     float_t _voltage_min = _frontend._params[_chan]._voltage_min.get();
     float_t _voltage_max = _frontend._params[_chan]._voltage_max.get();
-    uint8_t type = _frontend._params[_chan].type.get();
+    uint8_t type = _frontend._params[_chan].binding.get();
 
     switch (AP_DAC_Channel_Params::Type(type)){
         case AP_DAC_Channel_Params::Type::NONE:
             return 0;
         case AP_DAC_Channel_Params::Type::THROTTLE:
-            return _normalise(_frontend.command.throttle, -_minmax[type], _minmax[type], _voltage_min, _voltage_max) * _ratio;
+            return _normalise(_frontend.command.throttle, -100.0f, 100.0f, _voltage_min, _voltage_max) * _ratio;
+        case AP_DAC_Channel_Params::Type::THROTTLE_ABS:
+            return _normalise(abs(_frontend.command.throttle), 0.0f, 100.0f, _voltage_min, _voltage_max) * _ratio;
         case AP_DAC_Channel_Params::Type::REVERSE:
-            return 0;
+            return _normalise(-MIN(_frontend.command.throttle, 0), 0.0f, 100.0f, _voltage_min, _voltage_max) * _ratio;
     }
     return 0;
 }

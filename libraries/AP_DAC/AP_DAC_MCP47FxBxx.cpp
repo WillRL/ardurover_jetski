@@ -101,6 +101,7 @@ void AP_DAC_MCP47FxBxx::init(void)
                 _dev = nullptr;
             }
         }
+        _dev->set_retries(1);
     }
     else{
         _dev = std::move(hal.i2c_mgr->get_device(params.bus, params.bus_address));
@@ -138,15 +139,15 @@ bool AP_DAC_MCP47FxBxx::_detect_device_type(){
     if (_read_register_16(MCP47FXBXX_REG_VOL_DAC0, ret)) {
         switch(ret){
         case 0x07F:
-            _resolution = 255;
+            _resolution = 256; // From datasheet, it is calculated from 256 not 255.
             res = 0;
             break;
         case 0x1FF:
-            _resolution = 1023;
+            _resolution = 1024;
             res = 1;
             break;
         case 0x7FF:
-            _resolution = 4095;
+            _resolution = 4096;
             res = 2;
             break;
         }
@@ -181,7 +182,6 @@ bool AP_DAC_MCP47FxBxx::set_voltage(uint8_t chan, float voltage) {
     // convert voltage to 
     uint16_t voltage_bits = uint16_t(_resolution * voltage / params.voltage_reference);
     voltage_bits = MIN(voltage_bits, _resolution);
-    WITH_SEMAPHORE(_dev->get_semaphore());
     if(_write_register_16(_dac_vol_reg[chan], voltage_bits)){
         return true;
     }
@@ -365,6 +365,7 @@ bool AP_DAC_MCP47FxBxx::_read_register_16(uint8_t reg, uint16_t &val)
 {
     uint16_t v;
     reg = reg << 3 | 0b110;
+    WITH_SEMAPHORE(_dev->get_semaphore());
     if (!_dev->read_registers(reg, (uint8_t*)&v, sizeof(v))) {
         return false;
     }
@@ -382,6 +383,7 @@ bool AP_DAC_MCP47FxBxx::_read_register_16(uint8_t reg, uint16_t &val)
  */
 bool AP_DAC_MCP47FxBxx::_write_register_16(uint8_t reg, uint16_t val)
 {   
+    WITH_SEMAPHORE(_dev->get_semaphore());
     reg = reg << 3;
     uint8_t buf[3] { reg, uint8_t(val >> 8), uint8_t(val) };
     return _dev->transfer(buf, sizeof(buf), nullptr, 0);

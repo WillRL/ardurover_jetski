@@ -27,10 +27,11 @@ const AP_Param::GroupInfo AP_DAC_Channel_Params::var_info[] = {
 
     // @Param: BIND
     // @DisplayName: Channel Function
-    // @Description: Selects the function this DAC channel is bound to (e.g., Throttle, Steering, etc.). Typically mapped to specific vehicle outputs.
-    // @Values: 0:None, 1:Throttle, 2:Steering
+    // @Description: Selects the function this DAC channel is bound to (e.g., Throttle, Steering, etc.). Calculates output voltage by normalising the values to 0..1 and then scaling and shifting it to fit within min voltage and max voltage.
+    // Note that 'Throttle' typical range is -100 to 100, you may need a DAC that can do both negative and positive voltage otherwise. Otherwise use 'Throttle ABS' which maps abs(throttle) and 'Reverse' which maps the negative side of the throttle to positive voltage. Useful if there is a separate reverse mechanism (i.e jetski, some boats).
+    // @Values: 0:None, 1:Throttle, 2:Throttle ABS, 3:Reverse
     // @User: Standard
-    AP_GROUPINFO("BIND", 2, AP_DAC_Channel_Params, type, 0),
+    AP_GROUPINFO("BIND", 2, AP_DAC_Channel_Params, binding, 0),
 
     // @Param: MIN
     // @DisplayName: Minimum Voltage

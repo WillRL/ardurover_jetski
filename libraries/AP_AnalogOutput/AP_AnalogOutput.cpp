@@ -91,10 +91,18 @@ void AP_AnalogOutput::init()
     }
 }
 
-void AP_AnalogOutput::update(){
-    for (int i = 0; i <= 8; i++){
-        hal.console->printf("en: %i\n", int(_params[i].enabled));
+bool AP_AnalogOutput::update(){
+    bool ret = 1;
+    for (int i = 0; i <= 7; i++){
         if (!_params[i].enabled) continue;
-        _channels[i]->output();
+        ret &= _channels[i]->output();
     }
+    return ret;
+}
+
+
+// Used for example only!
+AP_DAC_Channel_Params *AP_AnalogOutput::get_param(int channel)
+{
+    return &_params[channel];
 }
