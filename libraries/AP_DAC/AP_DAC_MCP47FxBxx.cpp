@@ -88,36 +88,44 @@ void AP_DAC_MCP47FxBxx::init(void)
     _general_call_dev = std::move(hal.i2c_mgr->get_device(params.bus, 0x00));
     uint8_t recv = 0;
     if (params.bus_address <= 0) {
-        // GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Attempting to use default addresses for MCP47FxBxx");
-        hal.console->printf("Attempting to use default addresses for MCP47FxBxx\n");
         for (int addr : {MCP47FXBXX_I2CADDR_DEFAULT1, MCP47FXBXX_I2CADDR_DEFAULT2, MCP47FXBXX_I2CADDR_DEFAULT3, MCP47FXBXX_I2CADDR_DEFAULT4}) {
-            _dev = std::move(hal.i2c_mgr->get_device(params.bus, addr));
+            _dev = hal.i2c_mgr->get_device(params.bus, addr);
             WITH_SEMAPHORE(_dev->get_semaphore());
             _dev->set_retries(10);
+            
             if (_dev->read_registers(0, &recv, 1)){
+                _dev->set_retries(1);
                 break;
             } 
             else {
                 _dev = nullptr;
             }
         }
-        _dev->set_retries(1);
+        
     }
     else{
         _dev = std::move(hal.i2c_mgr->get_device(params.bus, params.bus_address));
         WITH_SEMAPHORE(_dev->get_semaphore());
         if (!_dev->read_registers(0, &recv, 1)){
             _dev = nullptr;
+        } else{
+            _dev->set_retries(1);
         }
-        _dev->set_retries(1);
     }
-
+    
+    
+    
     if (!_dev) {
-        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "MCP47FxBxx device is null at %u:%u", unsigned(params.bus), unsigned(params.bus_address));
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "MCP47FxBxx device not found\n");
         return;
     }
     
-    _detect_device_type();
+    if(!_detect_device_type()){
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Unknown MCP47FxBxx device at 0x%03x\n", _dev->get_bus_address());
+        _dev = nullptr;
+        return;
+    }
+
     set_voltage(0);
 }
 
@@ -127,6 +135,7 @@ void AP_DAC_MCP47FxBxx::init(void)
  * @return true if successful
  */
 bool AP_DAC_MCP47FxBxx::_detect_device_type(){
+    if (!_dev) return false;
     if(!general_wakeup()) return false;
 
     WITH_SEMAPHORE(_dev->get_semaphore());
@@ -164,8 +173,7 @@ bool AP_DAC_MCP47FxBxx::_detect_device_type(){
         mem_type = 'E';
         _eeprom = 1;
     }
-
-    hal.console->printf("Found MCP47F%cB%i%i on 0x%03x\n", mem_type, res, _channels, _dev->get_bus_address());
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Found MCP47F%cB%i%i on 0x%03x\n", mem_type, res, _channels, _dev->get_bus_address());
     _dev->set_retries(1);
     return true;
 }
@@ -363,6 +371,7 @@ bool AP_DAC_MCP47FxBxx::general_wakeup()
  */
 bool AP_DAC_MCP47FxBxx::_read_register_16(uint8_t reg, uint16_t &val)
 {
+    if (!_dev) return false;
     uint16_t v;
     reg = reg << 3 | 0b110;
     WITH_SEMAPHORE(_dev->get_semaphore());
@@ -383,6 +392,7 @@ bool AP_DAC_MCP47FxBxx::_read_register_16(uint8_t reg, uint16_t &val)
  */
 bool AP_DAC_MCP47FxBxx::_write_register_16(uint8_t reg, uint16_t val)
 {   
+    if (!_dev) return false;
     WITH_SEMAPHORE(_dev->get_semaphore());
     reg = reg << 3;
     uint8_t buf[3] { reg, uint8_t(val >> 8), uint8_t(val) };

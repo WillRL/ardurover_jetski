@@ -4,6 +4,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_StepperEncoder/AP_StepperEncoder.h>
+#include <GCS_MAVLink/GCS_Dummy.h>
 
 void setup();
 void loop();
@@ -29,4 +30,5 @@ void loop()
     encoder.update();
     hal.console->printf("pos %f, vel %f, acc %f \n", encoder.theta*57.2958, encoder.omega*57.2958, encoder.alpha*57.2958);
 }
+GCS_Dummy _gcs;
 AP_HAL_MAIN();

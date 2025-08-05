@@ -61,7 +61,7 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     // @Description: Pin used for enable stepper motor power.
     // @Values: 101:MAIN1,102:MAIN2,103:MAIN3,104:MAIN4,105:MAIN5,106:MAIN6,107:MAIN7,108:MAIN8,50:AUX1,51:AUX2,52:AUX3,53:AUX4,54:AUX5,55:AUX6
     // @User: Standard
-    AP_GROUPINFO("EN_PIN", 6, AP_StepperController, en_pin, 51),
+    AP_GROUPINFO("EN_PIN", 6, AP_StepperController, en_pin, 107),
 
     // @Param: DISARM_PWR
     // @DisplayName: Disarm Power

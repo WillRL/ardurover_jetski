@@ -20,7 +20,7 @@
 #include <AP_DAC/AP_DAC_Params.h>
 #include <AP_DAC/AP_DAC_MCP47FxBxx.h>
 #include <AP_HAL/I2CDevice.h>
-
+#include <GCS_MAVLink/GCS_Dummy.h>
 void setup();    // declaration of the setup() function
 void loop();     // declaration of the loop() function
 
@@ -45,7 +45,7 @@ void set_object_value(const void *object_pointer,
 
 void setup() {
     hal.scheduler->delay(5000);
-    hal.console->printf("Initialising MCP47FxBxx test\nDoing I2C bus scan...\n");    // print a starting message
+    hal.console->printf("Initialising MCP47FxBxx test...\n");    // print a starting message
     
     set_object_value(&params, params.var_info, "TYPE", 3);
     set_object_value(&params, params.var_info, "VREF", 5);
@@ -88,7 +88,7 @@ void loop()
     }
     // hal.scheduler->delay(100);
 }
-
+GCS_Dummy _gcs;
 AP_HAL_MAIN();    // HAL Macro that declares the main function. For more info see <https://ardupilot.org/dev/docs/learning-ardupilot-the-example-sketches.html/>
 
 

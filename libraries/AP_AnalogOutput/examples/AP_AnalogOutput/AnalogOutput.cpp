@@ -6,6 +6,7 @@
 #include <AP_AnalogOutput/AP_AnalogOutput.h>
 #include <AP_AnalogOutput/AP_DAC_Channel_Params.h>
 #include <AP_DAC/AP_DAC.h>
+#include <GCS_MAVLink/GCS_Dummy.h>
 
 void setup();
 void loop();
@@ -62,4 +63,6 @@ void loop()
     hal.console->printf("updated: %i\n", aout.update());
     hal.scheduler->delay(10);
 }
+
+GCS_Dummy _gcs;
 AP_HAL_MAIN();

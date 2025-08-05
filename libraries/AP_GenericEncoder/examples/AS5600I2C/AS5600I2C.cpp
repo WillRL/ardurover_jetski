@@ -19,6 +19,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_GenericEncoder/AP_GenericEncoder_AS5600I2C.h>
 #include <AP_HAL/I2CDevice.h>
+#include <GCS_MAVLink/GCS_Dummy.h>
 
 void setup();    // declaration of the setup() function
 void loop();     // declaration of the loop() function
@@ -59,7 +60,7 @@ void loop()
     // give a delay of 1000ms or 1s
     hal.scheduler->delay(1);
 }
-
+GCS_Dummy _gcs;
 AP_HAL_MAIN();    // HAL Macro that declares the main function. For more info see <https://ardupilot.org/dev/docs/learning-ardupilot-the-example-sketches.html/>
 
 

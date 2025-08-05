@@ -42,10 +42,10 @@ void AP_GenericEncoder_AS5600I2C::init(float *_ptr_pos, float *_ptr_dt_pos, floa
         _dev = hal.i2c_mgr->get_device(i, AS5600_ADDRESS);
         WITH_SEMAPHORE(_dev->get_semaphore());
         if (_dev->read_registers(0, &recv, 1)){
-            hal.console->printf("Found AS5600 on bus %li address 0x%02x\n", i, AS5600_ADDRESS);
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Found AS5600 on bus %li address 0x%02x\n", i, AS5600_ADDRESS);
             break;
         } else {
-            hal.console->printf("Could not find AS5600");
+            GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "Could not find AS5600 on bus %li\n", i);
         } 
     }
 
@@ -59,7 +59,7 @@ void AP_GenericEncoder_AS5600I2C::init(float *_ptr_pos, float *_ptr_dt_pos, floa
 void AP_GenericEncoder_AS5600I2C::setup()
 {
     // set the zero position to the current angle
-    hal.console->printf("AP_GenericEncoder_AS5600I2C: Setup complete.");
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "AP_GenericEncoder_AS5600I2C: Setup complete.");
 }
 
 void AP_GenericEncoder_AS5600I2C::calibrate()
