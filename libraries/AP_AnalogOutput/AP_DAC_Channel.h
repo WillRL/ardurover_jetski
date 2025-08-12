@@ -32,6 +32,6 @@ private:
     AP_AnalogOutput &_frontend;
     
     float _convert_command();
-    static float _normalise(float val, float min_old, float max_old, float min_new, float max_new);
+    static float _scale_normalise(float val, float min_old, float max_old, float min_new, float max_new);
 };
 
