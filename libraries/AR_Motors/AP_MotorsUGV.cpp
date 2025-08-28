@@ -212,6 +212,7 @@ void AP_MotorsUGV::setup_servo_output()
 {
     // k_steering are limited to -45;45 degree
     SRV_Channels::set_angle(SRV_Channel::k_steering, SERVO_MAX);
+    SRV_Channels::set_angle(SRV_Channel::k_mechanical_brake, SERVO_MAX);
 
     // k_throttle are in power percent so -100 ... 100
     SRV_Channels::set_angle(SRV_Channel::k_throttle, 100);
@@ -280,6 +281,13 @@ void AP_MotorsUGV::set_walking_height(float walking_height)
     _walking_height = constrain_float(walking_height, -1.0f, 1.0f);
 }
 
+// set mechanical_brake input as a value from -1 to +1
+void AP_MotorsUGV::set_mechanical_brake(float mechanical_brake)
+{
+    _mechanical_brake = constrain_float(mechanical_brake, -4500.0f, 4500.0f);
+}
+
+
 // set mainsail input as a value from 0 to 100
 void AP_MotorsUGV::set_mainsail(float mainsail)
 {
@@ -344,7 +352,7 @@ void AP_MotorsUGV::output(bool armed, float ground_speed, float dt)
     slew_limit_throttle(dt);
 
     // output for regular steering/throttle style frames
-    output_regular(armed, ground_speed, _steering, _throttle);
+    output_regular(armed, ground_speed, _steering, _throttle, _mechanical_brake);
 
     // output for skid steering style frames
     output_skid_steering(armed, _steering, _throttle, dt);
@@ -727,7 +735,7 @@ void AP_MotorsUGV::clear_omni_motors(int8_t motor_num)
 }
 
 // output to regular steering and throttle channels
-void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering, float throttle)
+void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering, float throttle, float mechanical_brake)
 {
     // output to throttle channels
     if (armed) {
@@ -797,6 +805,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
         if (_analogoutput.is_active){
             _analogoutput.command.throttle = throttle;
             _analogoutput.command.steering = steering;
+            _analogoutput.command.brake = mechanical_brake;
             _analogoutput.update();
         }
         
@@ -808,6 +817,10 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
         } else {
             SRV_Channels::set_output_limit(SRV_Channel::k_throttle, SRV_Channel::Limit::TRIM);
         }
+        _analogoutput.command.throttle = 0;
+        _analogoutput.command.steering = 0;
+        _analogoutput.command.brake = 0;
+        _analogoutput.update();
     }
 
     // clear and set limits based on input
@@ -828,14 +841,15 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
         
         hal.gpio->pinMode(_stepper_ctrl.en_pin, HAL_GPIO_OUTPUT);
         hal.gpio->write(_stepper_ctrl.en_pin, 0);
-        
         _stepper_ctrl.setpoint = steering/100.0f;
         _stepper_ctrl.update();
+
         // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f %f", steering_meas, _encoder_analog_source->voltage_latest());
         // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ABS ANGLE: %f", _encoder_analog_source->voltage_latest()/2.0f * (360.0f/5.0f));
         // _stepper_ctrl.update(((_encoder_analog_source->voltage_latest()/2) * (360.0f/5.0f)) - 180);
     };
     SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
+    SRV_Channels::set_output_scaled(SRV_Channel::k_mechanical_brake, mechanical_brake);
 }
 
 // output to skid steering channels

@@ -136,6 +136,7 @@ private:
     RC_Channel *channel_roll;
     RC_Channel *channel_pitch;
     RC_Channel *channel_walking_height;
+    RC_Channel *channel_mechanical_brake;
 
     // flight modes convenience array
     AP_Int8 *modes;

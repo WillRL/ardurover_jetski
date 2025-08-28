@@ -161,6 +161,10 @@ protected:
     // outputs are in the range -1 to +1
     void get_pilot_desired_walking_height(float &walking_height_out) const;
 
+    // decode pilot height inputs and return in height_out arguments
+    // outputs are in the range -1 to +1
+    void get_pilot_desired_mechanical_brake(float &mechanical_brake_out) const;
+
     // high level call to navigate to waypoint
     void navigate_to_waypoint();
 
@@ -209,6 +213,7 @@ protected:
     class RC_Channel *&channel_roll;
     class RC_Channel *&channel_pitch;
     class RC_Channel *&channel_walking_height;
+    class RC_Channel *&channel_mechanical_brake;
     class AR_AttitudeControl &attitude_control;
 
     // private members for waypoint navigation

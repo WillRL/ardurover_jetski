@@ -66,6 +66,10 @@ public:
     float get_walking_height() const { return _walking_height; }
     void set_walking_height(float walking_height);
 
+    // get or set mechanical_brake as a value from -1 to 1
+    float get_mechanical_brake() const { return _mechanical_brake; }
+    void set_mechanical_brake(float mechanical_brake);
+
     // get or set lateral input as a value from -100 to +100
     float get_lateral() const { return _lateral; }
     void set_lateral(float lateral);
@@ -166,7 +170,7 @@ private:
     void clear_omni_motors(int8_t motor_num);
 
     // output to regular steering and throttle channels
-    void output_regular(bool armed, float ground_speed, float steering, float throttle);
+    void output_regular(bool armed, float ground_speed, float steering, float throttle, float mechanical_brake);
 
     // output to skid steering channels
     void output_skid_steering(bool armed, float steering, float throttle, float dt);
@@ -224,6 +228,7 @@ private:
     float   _roll;      // requested roll as a value from -1 to +1
     float   _pitch;     // requested pitch as a value from -1 to +1
     float   _walking_height; // requested height as a value from -1 to +1   
+    float   _mechanical_brake; // requested mechanical brake as a value from -1 to +1
     float   _mainsail;  // requested mainsail input as a value from 0 to 100
     float   _wingsail;  // requested wing sail input as a value in the range +- 100
     float   _mast_rotation;  // requested mast rotation input as a value in the range +- 100

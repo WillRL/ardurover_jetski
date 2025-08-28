@@ -10,6 +10,7 @@ Mode::Mode() :
     channel_roll(rover.channel_roll),
     channel_pitch(rover.channel_pitch),
     channel_walking_height(rover.channel_walking_height),
+    channel_mechanical_brake(rover.channel_mechanical_brake),
     attitude_control(g2.attitude_control)
 { }
 
@@ -206,6 +207,18 @@ void Mode::get_pilot_desired_walking_height(float &walking_height_out) const
         walking_height_out = channel_walking_height->norm_input();
     } else {
         walking_height_out = 0.0f;
+    }
+}
+
+// decode pilot mechanical brake inputs and return in mechanical_brake_out arguments
+// outputs are in the range -1 to +1
+void Mode::get_pilot_desired_mechanical_brake(float &mechanical_brake_out) const
+{
+    
+    if (channel_mechanical_brake != nullptr) {
+        mechanical_brake_out = channel_mechanical_brake->norm_input();
+    } else {
+        mechanical_brake_out = 0.0f;
     }
 }
 

@@ -126,6 +126,7 @@ void AP_StepperController::update(){
     hal.gpio->write(_stepper_direction_pin, signbit(control_signal));
     uint32_t motor_mask = SRV_Channels::get_output_channel_mask(SRV_Channel::k_steering);
     hal.rcout->set_freq(motor_mask, abs(control_signal));
+    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "control_signal: %0.3f", control_signal);
 
 
     _prev_time = AP_HAL::millis(); // Update the previous time to the current time

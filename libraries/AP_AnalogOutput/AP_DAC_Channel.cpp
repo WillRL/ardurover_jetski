@@ -46,6 +46,9 @@ float AP_DAC_Channel::_convert_command()
 
         case AP_DAC_Channel_Params::Type::STEERING:
             return _scale_normalise(_frontend.command.steering, -4500.0f, 4500.0f, _voltage_min, _voltage_max) * _ratio;
+        
+        case AP_DAC_Channel_Params::Type::BRAKE:
+            return _scale_normalise(abs(_frontend.command.brake), 0.0f, 4500.0f, _voltage_min, _voltage_max) * _ratio;
     }
     return 0;
 }

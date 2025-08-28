@@ -27,6 +27,7 @@ class AP_AnalogOutput {
         struct Commands {
             float throttle;
             float steering;
+            float brake;
         };
 
         Commands command;

@@ -30,6 +30,7 @@ public:
         THROTTLE_ABS    = 2,
         REVERSE         = 3,
         STEERING        = 4,
+        BRAKE           = 5,
     };
     AP_Enum<Type> binding;             // 0=disabled, others see frontend enum TYPE
     AP_Int8 enabled;

@@ -28,6 +28,11 @@ void ModeManual::update()
     g2.motors.set_pitch(desired_pitch);
     g2.motors.set_walking_height(desired_walking_height);
 
+    // set mechanical brake
+    float desired_mechanical_brake;
+    get_pilot_desired_mechanical_brake(desired_mechanical_brake);
+    g2.motors.set_mechanical_brake(desired_mechanical_brake * 4500.0);
+
     // set sailboat sails
     g2.sailboat.set_pilot_desired_mainsail();
 
