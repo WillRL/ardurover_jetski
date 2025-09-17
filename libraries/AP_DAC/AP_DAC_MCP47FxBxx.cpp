@@ -142,27 +142,19 @@ bool AP_DAC_MCP47FxBxx::_detect_device_type(){
     _dev->set_retries(10);
 
     char mem_type = 'V';
-    int res = 0;
+    int res = -1;
 
     uint16_t ret;
-    if (_read_register_16(MCP47FXBXX_REG_VOL_DAC0, ret)) {
-        switch(ret){
-        case 0x07F:
-            _resolution = 256; // From datasheet, it is calculated from 256 not 255.
-            res = 0;
-            break;
-        case 0x1FF:
-            _resolution = 1024;
-            res = 1;
-            break;
-        case 0x7FF:
-            _resolution = 4096;
-            res = 2;
-            break;
+    for (uint8_t shift = 8; shift <= 12; shift += 2) {
+        uint16_t probe = (1 << shift) - 1;
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Probing %u\n", probe);
+        _write_register_16(MCP47FXBXX_REG_VOL_DAC0, probe);
+        _read_register_16(MCP47FXBXX_REG_VOL_DAC0, ret);
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "ret %u\n", ret);
+        if (ret == probe) {
+            res += 1;
+            _resolution *= 4;
         }
-    } else {
-        // Should always have dac0, otherwise device is invalid.
-        return false;
     }
 
     if (_read_register_16(MCP47FXBXX_REG_VOL_DAC4, ret)) {
@@ -170,9 +162,11 @@ bool AP_DAC_MCP47FxBxx::_detect_device_type(){
     } 
 
     if (_read_register_16(MCP47FXBXX_REG_EEP_DAC0, ret)) {
+        set_voltage_nonvolatile(0);
         mem_type = 'E';
         _eeprom = 1;
     }
+    
     GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Found MCP47F%cB%i%i on 0x%03x\n", mem_type, res, _channels, _dev->get_bus_address());
     _dev->set_retries(1);
     return true;
@@ -187,7 +181,7 @@ bool AP_DAC_MCP47FxBxx::_detect_device_type(){
  * @return true if successful
  */
 bool AP_DAC_MCP47FxBxx::set_voltage(uint8_t chan, float voltage) {
-    // convert voltage to 
+    // convert voltage to bits
     uint16_t voltage_bits = uint16_t(_resolution * voltage / params.voltage_reference);
     voltage_bits = MIN(voltage_bits, _resolution);
     if(_write_register_16(_dac_vol_reg[chan], voltage_bits)){
@@ -205,7 +199,6 @@ bool AP_DAC_MCP47FxBxx::set_voltage(uint8_t chan, float voltage) {
  * @return true if successfully set all channels, false if failed. Some may be not set.
  */
 bool AP_DAC_MCP47FxBxx::set_voltage(float voltage) {
-    // convert voltage to
     for (int chan = 0; chan < _channels; chan++){
         if(!set_voltage(chan, voltage)){
             return false;
@@ -213,6 +206,42 @@ bool AP_DAC_MCP47FxBxx::set_voltage(float voltage) {
     }
     return true;
     
+}
+
+/**
+ * @brief Sets the voltage for the channel specified (non-volatile EEPROM register)
+ * 
+ * @param[in]  chan     Channel to set the voltage on
+ * @param[in]  voltage  Voltage to set in V
+ * 
+ * @return true if successful
+ */
+bool AP_DAC_MCP47FxBxx::set_voltage_nonvolatile(uint8_t chan, float voltage) {
+    // convert voltage to bits
+    uint16_t voltage_bits = uint16_t(_resolution * voltage / params.voltage_reference);
+    voltage_bits = MIN(voltage_bits, _resolution);
+    if(_write_register_16(_dac_eep_reg[chan], voltage_bits)){
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief Sets the voltage for all channels (non-volatile EEPROM registers)
+ * 
+ * @param[in]  voltage  Voltage to set in V
+ * 
+ * @return true if successfully set all channels, false if any failed
+ */
+bool AP_DAC_MCP47FxBxx::set_voltage_nonvolatile(float voltage) {
+    for (int chan = 0; chan < _channels; chan++){
+        if(!set_voltage_nonvolatile(chan, voltage)){
+            GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Failed to set non-volatile voltage on channel %u", chan);
+            return false;
+        }
+        hal.scheduler->delay(10); // wait between eeprom writes
+    }
+    return true;
 }
 
 /**
@@ -348,6 +377,7 @@ bool AP_DAC_MCP47FxBxx::read_wiperlock_status(uint16_t &ret)
 bool AP_DAC_MCP47FxBxx::general_wakeup()
 {
     WITH_SEMAPHORE(_general_call_dev->get_semaphore());
+    _general_call_dev->set_retries(10);
     uint8_t cmd = MCP47FXBXX_GENERALCALL_WAKEUP;
     if(!_general_call_dev->transfer(&cmd, 1, nullptr, 0)){
         return false;

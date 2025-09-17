@@ -86,7 +86,7 @@ void loop()
         hal.scheduler->delay(10000);
         count = 0;
     }
-    // hal.scheduler->delay(100);
+    hal.scheduler->delay(delay);
 }
 GCS_Dummy _gcs;
 AP_HAL_MAIN();    // HAL Macro that declares the main function. For more info see <https://ardupilot.org/dev/docs/learning-ardupilot-the-example-sketches.html/>
