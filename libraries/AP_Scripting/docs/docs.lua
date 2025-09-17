@@ -4282,3 +4282,105 @@ function DroneCAN_Handle_ud:request(target_node, payload) end
 ---@return boolean -- true if send succeeded
 function DroneCAN_Handle_ud:broadcast(payload) end
 
+-- desc
+---@class AnalogCommands_ud
+local AnalogCommands_ud = {}
+
+---@return AnalogCommands_ud
+function AnalogCommands() end
+
+-- get throttle value
+---@return number
+function AnalogCommands_ud:throttle() end
+
+-- set throttle field
+---@param value number
+function AnalogCommands_ud:throttle(value) end
+
+-- get steering value
+---@return number
+function AnalogCommands_ud:steering() end
+
+-- set steering field
+---@param value number
+function AnalogCommands_ud:steering(value) end
+
+-- get brake value
+---@return number
+function AnalogCommands_ud:brake() end
+
+-- set brake field
+---@param value number
+function AnalogCommands_ud:brake(value) end
+
+-- get armed value
+---@return boolean
+function AnalogCommands_ud:armed() end
+
+-- set armed field
+---@param value boolean
+function AnalogCommands_ud:armed(value) end
+
+-- get lua1 value
+---@return number
+function AnalogCommands_ud:lua1() end
+
+-- set lua1 field
+---@param value number
+function AnalogCommands_ud:lua1(value) end
+
+-- get lua2 value
+---@return number
+function AnalogCommands_ud:lua2() end
+
+-- set lua2 field
+---@param value number
+function AnalogCommands_ud:lua2(value) end
+
+-- get lua3 value
+---@return number
+function AnalogCommands_ud:lua3() end
+
+-- set lua3 field
+---@param value number
+function AnalogCommands_ud:lua3(value) end
+
+-- get lua4 value
+---@return number
+function AnalogCommands_ud:lua4() end
+
+-- set lua4 field
+---@param value number
+function AnalogCommands_ud:lua4(value) end
+
+-- get lua5 value
+---@return number
+function AnalogCommands_ud:lua5() end
+
+-- set lua5 field
+---@param value number
+function AnalogCommands_ud:lua5(value) end
+
+-- get lua6 value
+---@return number
+function AnalogCommands_ud:lua6() end
+
+-- set lua6 field
+---@param value number
+function AnalogCommands_ud:lua6(value) end
+
+-- get lua7 value
+---@return number
+function AnalogCommands_ud:lua7() end
+
+-- set lua7 field
+---@param value number
+function AnalogCommands_ud:lua7(value) end
+
+-- get lua8 value
+---@return number
+function AnalogCommands_ud:lua8() end
+
+-- set lua8 field
+---@param value number
+function AnalogCommands_ud:lua8(value) end

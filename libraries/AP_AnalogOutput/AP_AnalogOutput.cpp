@@ -21,6 +21,18 @@
 #include <GCS_MAVLink/GCS.h>
 #include <cmath>
 extern const AP_HAL::HAL& hal;
+float AP_AnalogOutput::Commands::throttle = 0.0f;
+float AP_AnalogOutput::Commands::steering = 0.0f;
+float AP_AnalogOutput::Commands::brake    = 0.0f;
+bool  AP_AnalogOutput::Commands::armed    = false;
+float AP_AnalogOutput::Commands::lua1     = 0.0f;
+float AP_AnalogOutput::Commands::lua2     = 0.0f;
+float AP_AnalogOutput::Commands::lua3     = 0.0f;
+float AP_AnalogOutput::Commands::lua4     = 0.0f;
+float AP_AnalogOutput::Commands::lua5     = 0.0f;
+float AP_AnalogOutput::Commands::lua6     = 0.0f;
+float AP_AnalogOutput::Commands::lua7     = 0.0f;
+float AP_AnalogOutput::Commands::lua8     = 0.0f;
 
 const AP_Param::GroupInfo AP_AnalogOutput::var_info[] = {
     // @Param: STPR_EN

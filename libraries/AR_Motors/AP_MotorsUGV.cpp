@@ -802,12 +802,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
                 steering *= -1.0f;
             }
         }
-        if (_analogoutput.is_active){
-            _analogoutput.command.throttle = throttle;
-            _analogoutput.command.steering = steering;
-            _analogoutput.command.brake = mechanical_brake;
-            _analogoutput.update();
-        }
+        
         
         output_throttle(SRV_Channel::k_throttle, throttle);
     } else {
@@ -817,12 +812,14 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
         } else {
             SRV_Channels::set_output_limit(SRV_Channel::k_throttle, SRV_Channel::Limit::TRIM);
         }
-        _analogoutput.command.throttle = 0;
-        _analogoutput.command.steering = 0;
-        _analogoutput.command.brake = 0;
-        _analogoutput.update();
     }
-
+    if (_analogoutput.is_active){
+            AP_AnalogOutput::Commands::throttle = throttle;
+            AP_AnalogOutput::Commands::steering = steering;
+            AP_AnalogOutput::Commands::brake = mechanical_brake;
+            AP_AnalogOutput::Commands::armed = armed;
+            _analogoutput.update();
+        }
     // clear and set limits based on input
     // we do this here because vectored thrust or speed scaling may have reduced steering request
     set_limits_from_input(armed, steering, throttle);
@@ -836,20 +833,20 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
         if (!_stepper_ctrl.disarm_pwr && !armed){
             hal.gpio->pinMode(_stepper_ctrl.en_pin, HAL_GPIO_OUTPUT);
             hal.gpio->write(_stepper_ctrl.en_pin, 1);
-            return;
         }
-        
-        hal.gpio->pinMode(_stepper_ctrl.en_pin, HAL_GPIO_OUTPUT);
-        hal.gpio->write(_stepper_ctrl.en_pin, 0);
-        _stepper_ctrl.setpoint = steering/100.0f;
-        _stepper_ctrl.update();
-
+        else{
+            hal.gpio->pinMode(_stepper_ctrl.en_pin, HAL_GPIO_OUTPUT);
+            hal.gpio->write(_stepper_ctrl.en_pin, 0);
+            _stepper_ctrl.setpoint = steering/100.0f;
+            _stepper_ctrl.update();
+        }
         // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f %f", steering_meas, _encoder_analog_source->voltage_latest());
         // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ABS ANGLE: %f", _encoder_analog_source->voltage_latest()/2.0f * (360.0f/5.0f));
         // _stepper_ctrl.update(((_encoder_analog_source->voltage_latest()/2) * (360.0f/5.0f)) - 180);
     };
     SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
     SRV_Channels::set_output_scaled(SRV_Channel::k_mechanical_brake, mechanical_brake);
+   
 }
 
 // output to skid steering channels

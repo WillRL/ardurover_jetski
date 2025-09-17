@@ -25,16 +25,23 @@ class AP_AnalogOutput {
 
         AP_Int8 is_active; // Boolean, if analog output is enabled.
         struct Commands {
-            float throttle;
-            float steering;
-            float brake;
+            static float throttle;
+            static float steering;
+            static float brake;
+            static bool armed;
+            static float lua1;
+            static float lua2;
+            static float lua3;
+            static float lua4;
+            static float lua5;
+            static float lua6;
+            static float lua7;
+            static float lua8;
         };
 
-        Commands command;
 
         AP_DAC_Channel_Params *get_param(int channel);
-        
-        private:
+    private:
         AP_DAC& _dac;
         AP_DAC_Channel* _channels[8];
         AP_DAC_Channel_Params _params[8];

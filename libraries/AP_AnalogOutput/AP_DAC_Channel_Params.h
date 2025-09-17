@@ -31,6 +31,14 @@ public:
         REVERSE         = 3,
         STEERING        = 4,
         BRAKE           = 5,
+        LUA1            = 6,
+        LUA2            = 7,
+        LUA3            = 8,
+        LUA4            = 9,
+        LUA5            = 10,
+        LUA6            = 11,
+        LUA7            = 12,
+        LUA8            = 13,
     };
     AP_Enum<Type> binding;             // 0=disabled, others see frontend enum TYPE
     AP_Int8 enabled;
