@@ -9,6 +9,9 @@
 
 class AP_StepperController {
     public:
+        CLASS_NO_COPY(AP_StepperController);
+
+        static AP_StepperController *get_singleton();
         // Setpoint for the target angle
         float setpoint;
 
@@ -16,6 +19,14 @@ class AP_StepperController {
         AP_StepperController();
 
         void init();
+
+        void arm();
+        void disarm();
+
+        // LUA use only.
+        void _lua_arm();
+        void _lua_disarm();
+        void _lua_relinquish_control();
         
         // Speed is defined as a PWM. Every rising edge is a single step, so a PWM 
         void update();
@@ -24,7 +35,7 @@ class AP_StepperController {
         AP_Int8 is_active; // Boolean, if steering motor is a stepper motor.  
         
         AP_StepperEncoder encoder_frontend;
-        AP_Int8 en_pin;
+        
         AP_Int8 disarm_pwr;
 
     private:
@@ -37,4 +48,8 @@ class AP_StepperController {
         float _prev_control = 0;
         float _prev_time = 0; // Previous time.
         float _rad2deg = (180/M_PI);
+        AP_Int8 _en_pin;
+        int8_t _en_state;
+        bool _lua_override = false;
+        static AP_StepperController *_singleton;
 };

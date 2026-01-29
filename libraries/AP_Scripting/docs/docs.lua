@@ -4384,3 +4384,16 @@ function AnalogCommands_ud:lua8() end
 -- set lua8 field
 ---@param value number
 function AnalogCommands_ud:lua8(value) end
+
+
+-- desc
+stepper = {}
+
+-- desc
+function stepper:relinquish_control() end
+
+-- desc
+function stepper:disarm() end
+
+-- desc
+function stepper:arm() end

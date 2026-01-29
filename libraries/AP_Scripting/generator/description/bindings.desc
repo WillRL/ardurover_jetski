@@ -1129,6 +1129,18 @@ userdata AP_AnalogOutput::Commands field lua6 float'skip_check read write
 userdata AP_AnalogOutput::Commands field lua7 float'skip_check read write
 userdata AP_AnalogOutput::Commands field lua8 float'skip_check read write
 
+include AR_Motors/AP_StepperController.h depends APM_BUILD_TYPE(APM_BUILD_Rover)
+singleton AP_StepperController depends APM_BUILD_TYPE(APM_BUILD_Rover)
+singleton AP_StepperController rename stepper
+singleton AP_StepperController method _lua_arm void
+singleton AP_StepperController method _lua_disarm void
+singleton AP_StepperController method _lua_relinquish_control void
+
+singleton AP_StepperController method _lua_arm rename arm
+singleton AP_StepperController method _lua_disarm rename disarm
+singleton AP_StepperController method _lua_relinquish_control rename relinquish_control
+
+
 -- simulator only bindings
 include SITL/SITL.h depends AP_SIM_ENABLED
 singleton SITL::SIM depends AP_SIM_ENABLED

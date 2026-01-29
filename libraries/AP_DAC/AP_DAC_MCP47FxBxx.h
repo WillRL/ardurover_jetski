@@ -50,6 +50,7 @@ private:
     bool _set_dac_mode(bool vref, uint8_t chan, int mode, bool eep);
     bool _set_gain(uint8_t chan, uint8_t gain, bool eep);
     uint16_t _resolution = 64;
+    uint8_t _bits = 8;
     uint8_t _channels = 4;
     uint8_t _eeprom = 0;
 

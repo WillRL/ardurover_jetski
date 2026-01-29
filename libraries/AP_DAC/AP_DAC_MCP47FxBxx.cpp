@@ -147,13 +147,12 @@ bool AP_DAC_MCP47FxBxx::_detect_device_type(){
     uint16_t ret;
     for (uint8_t shift = 8; shift <= 12; shift += 2) {
         uint16_t probe = (1 << shift) - 1;
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Probing %u\n", probe);
         _write_register_16(MCP47FXBXX_REG_VOL_DAC0, probe);
         _read_register_16(MCP47FXBXX_REG_VOL_DAC0, ret);
-        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "ret %u\n", ret);
         if (ret == probe) {
             res += 1;
             _resolution *= 4;
+            _bits = shift;
         }
     }
 
@@ -189,6 +188,8 @@ bool AP_DAC_MCP47FxBxx::set_voltage(uint8_t chan, float voltage) {
     }
     return false;
 }
+
+
 
 /**
  * @brief Sets the voltage for all channels

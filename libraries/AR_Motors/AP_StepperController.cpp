@@ -20,6 +20,7 @@
 #include <GCS_MAVLink/GCS.h>
 #include <cmath>
 extern const AP_HAL::HAL& hal;
+AP_StepperController *AP_StepperController::_singleton;
 
 const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     // @Param: STPR_EN
@@ -61,7 +62,7 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     // @Description: Pin used for enable stepper motor power.
     // @Values: 101:MAIN1,102:MAIN2,103:MAIN3,104:MAIN4,105:MAIN5,106:MAIN6,107:MAIN7,108:MAIN8,50:AUX1,51:AUX2,52:AUX3,53:AUX4,54:AUX5,55:AUX6
     // @User: Standard
-    AP_GROUPINFO("EN_PIN", 6, AP_StepperController, en_pin, 107),
+    AP_GROUPINFO("EN_PIN", 6, AP_StepperController, _en_pin, 107),
 
     // @Param: DISARM_PWR
     // @DisplayName: Disarm Power
@@ -132,4 +133,35 @@ void AP_StepperController::update(){
     _prev_time = AP_HAL::millis(); // Update the previous time to the current time
     // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "set_om: %0.3f set_al: %0.3f ct: %0.3f", setpoint_omega, alpha, control_signal);
     // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "err_pos: %0.3f err_ome: %0.3f", error_pos, error_omega);
+}
+
+    
+void AP_StepperController::arm(){
+    hal.gpio->pinMode(_en_pin, HAL_GPIO_OUTPUT);
+    hal.gpio->write(_en_pin, 0);
+}
+
+void AP_StepperController::disarm(){
+    hal.gpio->pinMode(_en_pin, HAL_GPIO_OUTPUT);
+    hal.gpio->write(_en_pin, 1);
+}
+
+void AP_StepperController::_lua_arm(){
+    _lua_override = true;
+    arm();
+}
+
+void AP_StepperController::_lua_disarm(){
+    _lua_override = true;   
+    disarm();
+}
+
+void AP_StepperController::_lua_relinquish_control(){
+    _lua_override = false;
+}
+
+// Get the AP_StepperController singleton
+AP_StepperController *AP_StepperController::get_singleton()
+{
+    return AP_StepperController::_singleton;
 }
