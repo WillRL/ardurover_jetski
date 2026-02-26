@@ -137,11 +137,6 @@ void Sub::init_ardupilot()
     init_rangefinder();
 #endif
 
-    // initialise AP_RPM library
-#if AP_RPM_ENABLED
-    rpm_sensor.init();
-#endif
-
     // initialise mission library
     mission.init();
 #if HAL_LOGGING_ENABLED
@@ -161,6 +156,12 @@ void Sub::init_ardupilot()
     ins.set_log_raw_bit(MASK_LOG_IMU_RAW);
     g2.actuators.initialize_actuators();
 
+#if LEAKDETECTOR_MAX_INSTANCES > 0
+    update_leak_pins();
+#endif
+#if AP_RELAY_ENABLED
+    update_relay_pins();
+#endif
     // flag that initialisation has completed
     ap.initialised = true;
 }
@@ -279,7 +280,7 @@ bool AP_AdvancedFailsafe::gcs_terminate(bool should_terminate, const char *reaso
 AP_AdvancedFailsafe *AP::advancedfailsafe() { return nullptr; }
 #endif
 
-#if HAL_ADSB_ENABLED
+#if AP_ADSB_AVOIDANCE_ENABLED
 // dummy method to avoid linking AP_Avoidance
 AP_Avoidance *AP::ap_avoidance() { return nullptr; }
-#endif
+#endif  // AP_ADSB_AVOIDANCE_ENABLED

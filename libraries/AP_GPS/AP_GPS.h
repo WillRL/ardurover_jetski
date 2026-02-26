@@ -112,7 +112,7 @@ public:
         GPS_TYPE_UNICORE_NMEA = 24,
         GPS_TYPE_UNICORE_MOVINGBASE_NMEA = 25,
         GPS_TYPE_SBF_DUAL_ANTENNA = 26,
-#if HAL_SIM_GPS_ENABLED
+#if AP_SIM_GPS_ENABLED
         GPS_TYPE_SITL = 100,
 #endif
     };
@@ -370,11 +370,6 @@ public:
     }
     float ground_speed() const {
         return ground_speed(primary_instance);
-    }
-
-    // ground speed in cm/s
-    uint32_t ground_speed_cm(void) const {
-        return ground_speed() * 100;
     }
 
     // ground course in degrees

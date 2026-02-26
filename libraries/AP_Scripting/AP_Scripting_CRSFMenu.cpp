@@ -29,7 +29,6 @@ int lua_CRSF_new_menu(lua_State *L)
     binding_argcheck(L, 1);
 
     const char * name = luaL_checkstring(L, 1);
-    void *ud = lua_newuserdata(L, sizeof(CRSFMenu));
 
     AP_CRSF_Telem::ScriptedMenu* menu = AP::crsf_telem()->add_menu(name);
 
@@ -37,9 +36,7 @@ int lua_CRSF_new_menu(lua_State *L)
         return luaL_error(L, "No menu named: %s", name);
     }
 
-    new (ud) CRSFMenu(menu);
-    luaL_getmetatable(L, "CRSFMenu");
-    lua_setmetatable(L, -2);
+    *new_CRSFMenu(L) = CRSFMenu(menu);
 
     return 1;
 }
@@ -64,6 +61,26 @@ int lua_CRSF_get_menu_event(lua_State *L)
     lua_pushlstring(L, (const char*)payload.payload, payload.payload_length);
     lua_pushinteger(L, data);
     return 3;
+}
+
+int lua_CRSF_peek_menu_event(lua_State *L)
+{
+    binding_argcheck(L, 1);
+
+    uint8_t param = 0;
+    uint8_t events = 0;
+    AP_CRSF_Telem::ScriptedPayload payload {};
+    const uint8_t count = AP::crsf_telem()->peek_menu_event(param, payload, events);
+
+#if 4 > LUA_MINSTACK
+    luaL_checkstack(L, 4, nullptr);
+#endif
+
+    lua_pushinteger(L, count);
+    lua_pushinteger(L, param);
+    lua_pushlstring(L, (const char*)payload.payload, payload.payload_length);
+    lua_pushinteger(L, events);
+    return 4;
 }
 
 int lua_CRSF_send_response(lua_State *L)

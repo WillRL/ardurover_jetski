@@ -11,11 +11,6 @@
 #include <GCS_MAVLink/GCS_MAVLink.h>
 #include "AP_BattMonitor_Params.h"
 
-// maximum number of battery monitors
-#ifndef AP_BATT_MONITOR_MAX_INSTANCES
-#define AP_BATT_MONITOR_MAX_INSTANCES       9
-#endif
-
 // first monitor is always the primary monitor
 #define AP_BATT_PRIMARY_INSTANCE            0
 
@@ -213,6 +208,14 @@ public:
     bool overpower_detected() const;
     bool overpower_detected(uint8_t instance) const;
 
+#if AP_BATTERY_WATT_MAX_ENABLED
+    /// get_watt_max - returns maximum power in watts
+    float get_watt_max() const { return get_watt_max(AP_BATT_PRIMARY_INSTANCE); }
+    float get_watt_max(uint8_t instance) const {
+        return _params[instance]._watt_max;
+    }
+#endif // AP_BATTERY_WATT_MAX_ENABLED
+
     // cell voltages in millivolts
     bool has_cell_voltages() const { return has_cell_voltages(AP_BATT_PRIMARY_INSTANCE); }
     bool has_cell_voltages(const uint8_t instance) const;
@@ -221,7 +224,7 @@ public:
 
     // get once cell voltage (for scripting)
     bool get_cell_voltage(uint8_t instance, uint8_t cell, float &voltage) const;
-
+    
     // temperature
     bool get_temperature(float &temperature) const { return get_temperature(temperature, AP_BATT_PRIMARY_INSTANCE); }
     bool get_temperature(float &temperature, const uint8_t instance) const;
@@ -230,9 +233,9 @@ public:
     bool set_temperature_by_serial_number(const float temperature, const int32_t serial_number);
 #endif
 
-    // MPPT Control (Solar panels)
-    void MPPT_set_powered_state_to_all(const bool power_on);
-    void MPPT_set_powered_state(const uint8_t instance, const bool power_on);
+    // Set powered state (Solar Panels, BMS)
+    void set_powered_state_to_all(const bool power_on);
+    void set_powered_state(const uint8_t instance, const bool power_on);
 
     bool option_is_set(uint8_t instance, AP_BattMonitor_Params::Options option) const;
 
@@ -280,8 +283,6 @@ private:
     AP_BattMonitor_Backend *drivers[AP_BATT_MONITOR_MAX_INSTANCES];
     uint32_t    _log_battery_bit;
     uint8_t     _num_instances;                                     /// number of monitors
-
-    void convert_dynamic_param_groups(uint8_t instance);
 
     /// returns the failsafe state of the battery
     Failsafe check_failsafe(const uint8_t instance);

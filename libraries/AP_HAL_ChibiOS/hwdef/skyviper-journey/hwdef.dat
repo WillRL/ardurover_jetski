@@ -92,8 +92,6 @@ SPIDEV pixartflow SPI2 DEVID2 FLOW_CS  MODE3 2*MHZ 2*MHZ
 # reserve 16k for bootloader and 32k for storage
 FLASH_RESERVE_START_KB 48
 
-define HAL_CHIBIOS_ARCH_F412 1
-
 IMU Invensense I2C:1:0x68 ROTATION_NONE
 
 # radio IRQ is on GPIO(100)
@@ -117,13 +115,13 @@ define HAL_STORAGE_SIZE 15360
 # setup defines for ArduCopter config
 define TOY_MODE_ENABLED 1
 define ARMING_DELAY_SEC 0
-define LAND_START_ALT 700
 define LAND_DETECTOR_ACCEL_MAX 2.0f
 define ALLOW_ARM_NO_COMPASS
 
 COMPASS BMM150 I2C:0:0x10 false ROTATION_NONE
 
 BARO ICM20789 I2C:1:0x63 I2C:1:0x68
+define HAL_TCAL_BARO_EXP_DEFAULT 1.2
 
 # unstick 20789 on I2C on boot
 define HAL_I2C_CLEAR_BUS

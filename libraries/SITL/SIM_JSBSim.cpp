@@ -16,9 +16,11 @@
   simulator connector for JSBSim
 */
 
-#include "SIM_JSBSim.h"
+#include "SIM_config.h"
 
-#if HAL_SIM_JSBSIM_ENABLED
+#if AP_SIM_JSBSIM_ENABLED
+
+#include "SIM_JSBSim.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -62,11 +64,6 @@ JSBSim::JSBSim(const char *frame_str) :
     if (model_name != nullptr) {
         jsbsim_model = model_name + 1;
     }
-    control_port = 5505 + instance*10;
-    fdm_port = 5504 + instance*10;
-
-    printf("JSBSim backend started: control_port=%u fdm_port=%u\n",
-           control_port, fdm_port);
 }
 
 /*
@@ -74,6 +71,12 @@ JSBSim::JSBSim(const char *frame_str) :
  */
 bool JSBSim::create_templates(void)
 {
+	control_port = 5505 + instance*10;
+	fdm_port = 5504 + instance*10;
+
+	printf("JSBSim backend started: instance=%u control_port=%u fdm_port=%u\n",
+		   instance, control_port, fdm_port);
+		   
     if (created_templates) {
         return true;
     }
@@ -487,4 +490,4 @@ void JSBSim::update(const struct sitl_input &input)
 
 } // namespace SITL
 
-#endif  // HAL_SIM_JSBSIM_ENABLED
+#endif  // AP_SIM_JSBSIM_ENABLED

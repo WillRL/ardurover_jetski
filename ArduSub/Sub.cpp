@@ -140,9 +140,6 @@ const AP_Scheduler::Task Sub::scheduler_tasks[] = {
 #if HAL_LOGGING_ENABLED
     SCHED_TASK_CLASS(AP_Scheduler,        &sub.scheduler,    update_logging,     0.1,  75,  63),
 #endif
-#if AP_RPM_ENABLED
-    SCHED_TASK_CLASS(AP_RPM,              &sub.rpm_sensor,   update,              10, 200,  66),
-#endif
     SCHED_TASK(terrain_update,        10,    100,  72),
 #if AP_STATS_ENABLED
     SCHED_TASK(stats_update,           1,    200,  76),
@@ -179,9 +176,9 @@ constexpr int8_t Sub::_failsafe_priorities[5];
 void Sub::run_rate_controller()
 {
     const float last_loop_time_s = AP::scheduler().get_last_loop_time_s();
-    motors.set_dt(last_loop_time_s);
-    attitude_control.set_dt(last_loop_time_s);
-    pos_control.set_dt(last_loop_time_s);
+    motors.set_dt_s(last_loop_time_s);
+    attitude_control.set_dt_s(last_loop_time_s);
+    pos_control.set_dt_s(last_loop_time_s);
 
     //don't run rate controller in manual or motordetection modes
     if (control_mode != Mode::Number::MANUAL && control_mode != Mode::Number::MOTOR_DETECT) {
@@ -235,7 +232,7 @@ void Sub::ten_hz_logging_loop()
             logger.Write_PID(LOG_PIDR_MSG, attitude_control.get_rate_roll_pid().get_pid_info());
             logger.Write_PID(LOG_PIDP_MSG, attitude_control.get_rate_pitch_pid().get_pid_info());
             logger.Write_PID(LOG_PIDY_MSG, attitude_control.get_rate_yaw_pid().get_pid_info());
-            logger.Write_PID(LOG_PIDA_MSG, pos_control.get_accel_U_pid().get_pid_info());
+            logger.Write_PID(LOG_PIDA_MSG, pos_control.D_get_accel_pid().get_pid_info());
         }
     }
     if (should_log(MASK_LOG_MOTBATT)) {
@@ -272,7 +269,7 @@ void Sub::twentyfive_hz_logging()
             logger.Write_PID(LOG_PIDR_MSG, attitude_control.get_rate_roll_pid().get_pid_info());
             logger.Write_PID(LOG_PIDP_MSG, attitude_control.get_rate_pitch_pid().get_pid_info());
             logger.Write_PID(LOG_PIDY_MSG, attitude_control.get_rate_yaw_pid().get_pid_info());
-            logger.Write_PID(LOG_PIDA_MSG, pos_control.get_accel_U_pid().get_pid_info());
+            logger.Write_PID(LOG_PIDA_MSG, pos_control.D_get_accel_pid().get_pid_info());
         }
     }
 
@@ -345,7 +342,7 @@ void Sub::one_hz_loop()
     set_likely_flying(hal.util->get_soft_armed());
 
     attitude_control.set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
-    pos_control.get_accel_U_pid().set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
+    pos_control.D_get_accel_pid().set_notch_sample_rate(AP::scheduler().get_filtered_loop_rate_hz());
 }
 
 void Sub::read_AHRS()

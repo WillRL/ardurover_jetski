@@ -233,7 +233,7 @@ public:
         k_param_acro_balance_pitch,
 
         // RPM Sensor
-        k_param_rpm_sensor = 232, // Disabled
+        k_param_rpm_sensor_old = 232, // unused - moved to vehicle
 
         // RC_Mapper Library
         k_param_rcmap, // Disabled
@@ -418,9 +418,10 @@ extern const AP_Param::Info        var_info[];
 // Sub-specific default parameters
 static const struct AP_Param::defaults_table_struct defaults_table[] = {
     { "BRD_SAFETY_DEFLT",    0 },
-    { "ARMING_CHECK",        uint32_t(AP_Arming::Check::RC) |
-                             uint32_t(AP_Arming::Check::VOLTAGE) |
-                             uint32_t(AP_Arming::Check::BATTERY)},
+    { "ARMING_SKIPCHK",      (~(uint32_t(AP_Arming::Check::RC) |
+                                uint32_t(AP_Arming::Check::VOLTAGE) |
+                                uint32_t(AP_Arming::Check::BATTERY))
+                               ) & ((1U<<24)-1)}, // keep within float range but disable future checks
     { "CIRCLE_RATE",         2.0f},
     { "ATC_ACCEL_Y_MAX",     110000.0f},
     { "ATC_RATE_Y_MAX",      180.0f},
@@ -440,18 +441,15 @@ static const struct AP_Param::defaults_table_struct defaults_table[] = {
     { "RC8_OPTION",          213},   // MOUNT1_PITCH
     { "MOT_PWM_MIN",         1100},
     { "MOT_PWM_MAX",         1900},
-    { "PSC_JERK_Z",          50.0f},
+    { "PSC_JERK_D",          50.0f},
     { "WPNAV_SPEED",         100.0f},
     { "PILOT_SPEED_UP",      100.0f},
-    { "PSC_VELXY_P",         6.0f},
+    { "PSC_NE_VEL_P",         6.0f},
     { "EK3_SRC1_VELZ",       0},
 #if AP_SUB_RC_ENABLED
     { "RC_PROTOCOLS",        0},
 #endif
 #if CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_NAVIGATOR
-#if AP_BARO_PROBE_EXT_PARAMETER_ENABLED
-    { "BARO_PROBE_EXT",      0},
-#endif
     { "BATT_MONITOR",        4},
     { "BATT_CAPACITY",       0},
     { "LEAK1_PIN",           27},

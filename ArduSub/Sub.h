@@ -165,10 +165,6 @@ private:
         LowPassFilterFloat alt_filt;         // altitude filter
     } rangefinder_state = { false, false, 0, 0, 0, 0, 0, 0 };
 
-#if AP_RPM_ENABLED
-    AP_RPM rpm_sensor;
-#endif
-
     // Mission library
     AP_Mission mission{
             FUNCTOR_BIND_MEMBER(&Sub::start_command, bool, const AP_Mission::Mission_Command &),
@@ -581,6 +577,13 @@ private:
     uint16_t get_pilot_speed_dn() const;
 
     void convert_old_parameters(void);
+
+#if LEAKDETECTOR_MAX_INSTANCES > 0
+    void update_leak_pins();
+#endif
+#if AP_RELAY_ENABLED
+    void update_relay_pins();
+#endif
     bool handle_do_motor_test(mavlink_command_int_t command);
     bool init_motor_test();
     bool verify_motor_test();

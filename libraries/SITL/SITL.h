@@ -59,6 +59,7 @@ class FlightAxis;
 struct sitl_fdm {
     // this is the structure passed between FDM models and the main SITL code
     uint64_t timestamp_us;
+    uint64_t flightaxis_imu_frame_num; // the sitl frame number that should have a corresponding imu sample
     Location home;
     double latitude, longitude; // degrees
     double altitude;  // MSL
@@ -114,10 +115,28 @@ class SIM {
 public:
 
     SIM() {
+        if (_singleton != nullptr) {
+            AP_HAL::panic("Too many SITL instances");
+        }
+        _singleton = this;
+    }
+
+    /* Do not allow copies */
+    CLASS_NO_COPY(SIM);
+
+    static SIM *_singleton;
+    static SIM *get_singleton() { return _singleton; }
+
+    void init() {
+        if (init_done) {
+            return;
+        }
+        init_done = true;
+
         AP_Param::setup_object_defaults(this, var_info);
         AP_Param::setup_object_defaults(this, var_info2);
         AP_Param::setup_object_defaults(this, var_info3);
-#if HAL_SIM_GPS_ENABLED
+#if AP_SIM_GPS_ENABLED
         AP_Param::setup_object_defaults(this, var_gps);
 #endif
         AP_Param::setup_object_defaults(this, var_mag);
@@ -135,22 +154,14 @@ public:
         for (uint8_t i = 0; i < HAL_COMPASS_MAX_SENSORS; i++) {
             mag_ofs[i].set(Vector3f(5, 13, -18));
         }
-        if (_singleton != nullptr) {
-            AP_HAL::panic("Too many SITL instances");
-        }
-        _singleton = this;
     }
-
-    /* Do not allow copies */
-    CLASS_NO_COPY(SIM);
-
-    static SIM *_singleton;
-    static SIM *get_singleton() { return _singleton; }
+    bool init_done;
 
     enum SITL_RCFail {
         SITL_RCFail_None = 0,
         SITL_RCFail_NoPulses = 1,
         SITL_RCFail_Throttle950 = 2,
+        SITL_RCFail_Protocol_Fail_Bit_Set = 3,
     };
 
     enum GPSHeading {
@@ -169,7 +180,7 @@ public:
     static const struct AP_Param::GroupInfo var_info[];
     static const struct AP_Param::GroupInfo var_info2[];
     static const struct AP_Param::GroupInfo var_info3[];
-#if HAL_SIM_GPS_ENABLED
+#if AP_SIM_GPS_ENABLED
     static const struct AP_Param::GroupInfo var_gps[];
 #endif
     static const struct AP_Param::GroupInfo var_mag[];
@@ -326,6 +337,7 @@ public:
     };
     GPSParms gps[AP_SIM_MAX_GPS_SENSORS];
 
+#if AP_SIM_VICON_ENABLED
     class ViconParms {
     public:
         ViconParms(void) {
@@ -346,6 +358,7 @@ public:
         AP_Int16 rate_hz;     // vicon data rate in Hz
     };
     ViconParms vicon;
+#endif  // AP_SIM_VICON_ENABLED
 
     // physics model parameters
     class ModelParm {
@@ -369,9 +382,9 @@ public:
 #if AP_SIM_FLIGHTAXIS_ENABLED
         FlightAxis *flightaxis_ptr;
 #endif
-#if HAL_SIM_AIS_ENABLED
+#if AP_SIM_AIS_ENABLED
         class AIS *ais_ptr;
-#endif
+#endif  // AP_SIM_AIS_ENABLED
     };
     ModelParm models;
     
