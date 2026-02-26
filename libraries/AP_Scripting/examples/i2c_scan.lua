@@ -24,7 +24,7 @@ function update() -- this is the loop which periodically runs
     found = 0
   end
 
-  return update, 100 -- reschedules the loop
+  return update, 10 -- reschedules the loop
 end
 
 return update() -- run immediately before starting to reschedule

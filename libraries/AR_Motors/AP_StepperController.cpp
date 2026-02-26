@@ -16,6 +16,7 @@
  */
 
 #include "AP_StepperController.h"
+#include <AP_Math/AP_Math.h>
 #include <AP_HAL/AP_HAL.h>
 #include <GCS_MAVLink/GCS.h>
 #include <cmath>
@@ -79,9 +80,12 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     // @Path: ../PID/PID.cpp
     AP_SUBGROUPINFO(_pid_angle, "ANG_",  9, AP_StepperController, PID),
 
-    // @Param: PID_
-    // @Path: ../PID/PID.cpp
-    // AP_SUBGROUPINFO(_pid_rate, "RAT_",  10, AP_StepperController, PID),
+    // @Param: TRIM
+    // @DisplayName: TRIM
+    // @Description: Trim for steering in degrees.
+    // @Values: -180..180
+    // @User: Standard
+    AP_GROUPINFO("TRIM", 10, AP_StepperController, _trim, 0),
     
     AP_GROUPEND
 };
@@ -90,6 +94,10 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
 AP_StepperController::AP_StepperController()
 {
     AP_Param::setup_object_defaults(this, var_info);
+    if (_singleton != nullptr) {
+        AP_HAL::panic("AP_StepperController must be singleton");
+    }
+    _singleton = this;
 }
 
 void AP_StepperController::init(){
@@ -99,7 +107,7 @@ void AP_StepperController::init(){
 void AP_StepperController::update(){
     // Calculate the next signal based on the setpoint and gear ratio
     // curr_state is the encoders current state. This is usually placed directly on the stepper motor shaft.
-    float curr_theta = encoder_frontend.theta * _rad2deg - 180.0f;
+    float curr_theta = wrap_360(encoder_frontend.theta * _rad2deg + _trim) - 180.0f;
     // float curr_omega = encoder_frontend.omega * _rad2deg;
     // float dt = AP_HAL::millis() -  _prev_time; 
     
@@ -160,8 +168,8 @@ void AP_StepperController::_lua_relinquish_control(){
     _lua_override = false;
 }
 
-// Get the AP_StepperController singleton
-AP_StepperController *AP_StepperController::get_singleton()
-{
-    return AP_StepperController::_singleton;
+namespace AP {
+AP_StepperController &stepper() {
+    return *AP_StepperController::get_singleton();
 }
+};

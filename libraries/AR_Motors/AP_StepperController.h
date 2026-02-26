@@ -11,7 +11,7 @@ class AP_StepperController {
     public:
         CLASS_NO_COPY(AP_StepperController);
 
-        static AP_StepperController *get_singleton();
+        static AP_StepperController *get_singleton() {return _singleton;};
         // Setpoint for the target angle
         float setpoint;
 
@@ -45,6 +45,7 @@ class AP_StepperController {
         AP_Int32 _max_freq;
         PID _pid_angle;
         PID _pid_rate;
+        AP_Int32 _trim;
         float _prev_control = 0;
         float _prev_time = 0; // Previous time.
         float _rad2deg = (180/M_PI);
@@ -52,4 +53,8 @@ class AP_StepperController {
         int8_t _en_state;
         bool _lua_override = false;
         static AP_StepperController *_singleton;
+};
+
+namespace AP {
+    AP_StepperController &stepper();
 };

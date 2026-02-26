@@ -59,7 +59,7 @@ public:
     // return true if sensor is enabled
     bool enabled() const;
 
-    // return true if sensor is basically healthy (we are receiving data)
+    // return true if sensor is basically +thy (we are receiving data)
     bool healthy() const;
 
     // get user defined orientation

@@ -2,8 +2,8 @@
 
 #include <AP_HAL/AP_HAL_Boards.h>
 
-#include <AP_Airspeed/AP_Airspeed_config.h>
-#include <AP_RPM/AP_RPM_config.h>
+// #include <AP_Airspeed/AP_Airspeed_config.h>
+// #include <AP_RPM/AP_RPM_config.h>
 
 #ifndef AP_GENERICENCODER_ENABLED
 #define AP_GENERICENCODER_ENABLED 1
