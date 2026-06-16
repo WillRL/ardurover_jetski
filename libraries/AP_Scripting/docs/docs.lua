@@ -4521,3 +4521,323 @@ function stepper:disarm() end
 
 -- desc
 function stepper:arm() end
+
+
+-- desc
+---@class DRV8462SPIConfig_ud
+local DRV8462SPIConfig_ud = {}
+
+---@return DRV8462SPIConfig_ud
+function DRV8462SPIConfig() end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:vref_int_en() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:vref_int_en(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:tstsl_dly() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:tstsl_dly(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:tstsl_fall() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:tstsl_fall(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:en_stsl() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:en_stsl(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:trq_dac() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:trq_dac(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:istsl() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:istsl(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:en_auto() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:en_auto(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:res_auto() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:res_auto(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:step_edge() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:step_edge(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:ol_t() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:ol_t(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:ol_mode() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:ol_mode(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:en_ol() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:en_ol(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:trq_scale() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:trq_scale(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:dis_ssc() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:dis_ssc(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:rc_ripple() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:rc_ripple(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:stall_th() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:stall_th(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:step_frq_tol() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:step_frq_tol(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:frq_chg() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:frq_chg(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:stl_rep() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:stl_rep(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:en_stl() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:en_stl(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:stl_lrn() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:stl_lrn(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:tblank_time() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:tblank_time(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:otw_rep() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:otw_rep(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:otsd_mode() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:otsd_mode(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:ocp_mode() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:ocp_mode(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:tocp() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:tocp(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:lock() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:lock(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:clr_flt() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:clr_flt(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:microstep_mode() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:microstep_mode(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:spi_step() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:spi_step(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:spi_dir() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:spi_dir(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:step() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:step(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:dir() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:dir(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:decay() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:decay(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:toff() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:toff(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:idx_rst() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:idx_rst(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:sr() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:sr(value) end
+
+-- get field
+---@return integer
+function DRV8462SPIConfig_ud:en_out() end
+
+-- set field
+---@param value integer
+function DRV8462SPIConfig_ud:en_out(value) end
+
+-- desc
+DRV8462SPI = {}
+
+-- desc
+---@param param1 DRV8462SPIConfig_ud
+---@return boolean
+function DRV8462SPI:write_config(param1) end

@@ -37,7 +37,7 @@ public:
     static AP_StepperEncoder *get_singleton();
     void init();
 
-    // update wind vane
+    // update encoder value
     void update();
 
     // parameter block
@@ -55,7 +55,7 @@ public:
 
 private:
     // parameters
-    AP_Int8 _encoder_type;                          // type of windvane being used
+    AP_Int8 _encoder_type;                          // type of encoder being used
     AP_StepperEncoder_Backend *_driver;
 };
 

@@ -1,0 +1,26 @@
+-- Read and print ADC voltages for the four analog input channels
+
+local ain_throttle_fs = analog:channel()
+local ain_throttle_hs = analog:channel()
+local ain_brake_fs    = analog:channel()
+local ain_brake_hs    = analog:channel()
+
+ain_throttle_fs:set_pin(2)
+ain_throttle_hs:set_pin(3)
+ain_brake_fs:set_pin(4)
+ain_brake_hs:set_pin(5)
+
+function update()
+    local v_thr_fs = ain_throttle_fs:voltage_latest()
+    local v_thr_hs = ain_throttle_hs:voltage_latest()
+    local v_brk_fs = ain_brake_fs:voltage_latest()
+    local v_brk_hs = ain_brake_hs:voltage_latest()
+
+    gcs:send_text(6, string.format(
+        "thr_fs=%.3fV  thr_hs=%.3fV  brk_fs=%.3fV  brk_hs=%.3fV",
+        v_thr_fs, v_thr_hs, v_brk_fs, v_brk_hs))
+
+    return update, 500
+end
+
+return update()

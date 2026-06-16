@@ -1173,6 +1173,53 @@ singleton AP_StepperController method _lua_arm rename arm
 singleton AP_StepperController method _lua_disarm rename disarm
 singleton AP_StepperController method _lua_relinquish_control rename relinquish_control
 
+include AP_StepperDriver/AP_StepperDriver_DRV8462SPI.h depends APM_BUILD_TYPE(APM_BUILD_Rover)
+include AP_StepperDriver/AP_StepperDriver_config.h depends APM_BUILD_TYPE(APM_BUILD_Rover)
+singleton AP_StepperDriver_DRV8462SPI depends APM_BUILD_TYPE(APM_BUILD_Rover) && AP_STEPPERDRIVER_DRV8462SPI_ENABLED
+singleton AP_StepperDriver_DRV8462SPI rename DRV8462SPI
+singleton AP_StepperDriver_DRV8462SPI method write_config boolean AP_StepperDriver_DRV8462SPI::config
+
+userdata AP_StepperDriver_DRV8462SPI::config depends APM_BUILD_TYPE(APM_BUILD_Rover) && AP_STEPPERDRIVER_DRV8462SPI_ENABLED
+userdata AP_StepperDriver_DRV8462SPI::config rename DRV8462SPIConfig
+userdata AP_StepperDriver_DRV8462SPI::config field en_out int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field sr int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field idx_rst int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field toff int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field decay int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field dir int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field step int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field spi_dir int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field spi_step int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field microstep_mode int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field clr_flt int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field lock int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field tocp int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field ocp_mode int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field otsd_mode int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field otw_rep int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field tblank_time int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field stl_lrn int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field en_stl int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field stl_rep int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field frq_chg int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field step_frq_tol int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field stall_th int16_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field rc_ripple int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field dis_ssc int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field trq_scale int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field en_ol int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field ol_mode int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field ol_t int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field step_edge int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field res_auto int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field en_auto int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field istsl int16_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field trq_dac int16_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field en_stsl int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field tstsl_fall int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field tstsl_dly int8_t'skip_check read write
+userdata AP_StepperDriver_DRV8462SPI::config field vref_int_en int8_t'skip_check read write
+
 
 -- simulator only bindings
 include SITL/SITL.h depends AP_SIM_ENABLED

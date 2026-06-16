@@ -847,6 +847,7 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
     // always allow steering to move
     // If stepper control is active, this means we are using speed control by adjusting PWM freq.
     if (_stepper_ctrl.is_active) {
+        SRV_Channels::set_output_scaled(SRV_Channel::k_steering, 0);
         if (!_stepper_ctrl.disarm_pwr && !armed){
             _stepper_ctrl.disarm();
         }
@@ -854,12 +855,11 @@ void AP_MotorsUGV::output_regular(bool armed, float ground_speed, float steering
             _stepper_ctrl.arm();
             _stepper_ctrl.setpoint = steering/100.0f;
             _stepper_ctrl.update();
+            // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f", _stepper_ctrl.setpoint);
         }
-        // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f %f", steering_meas, _encoder_analog_source->voltage_latest());
-        // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "ABS ANGLE: %f", _encoder_analog_source->voltage_latest()/2.0f * (360.0f/5.0f));
-        // _stepper_ctrl.update(((_encoder_analog_source->voltage_latest()/2) * (360.0f/5.0f)) - 180);
-    };
-    SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
+    } else {
+        SRV_Channels::set_output_scaled(SRV_Channel::k_steering, steering);
+    }
     SRV_Channels::set_output_scaled(SRV_Channel::k_mechanical_brake, mechanical_brake);
    
 }

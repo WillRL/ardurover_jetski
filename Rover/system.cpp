@@ -67,6 +67,9 @@ void Rover::init_ardupilot()
     g2.motors.init(get_frame_type());        // init motors including setting servo out channels ranges
     AP::srv().enable_aux_servos();
 
+    // init stepper driver
+    g2.stepper_driver.init();
+
     // init wheel encoders
     g2.wheel_encoder.init();
 

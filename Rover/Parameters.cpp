@@ -638,14 +638,18 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Path: ../libraries/AR_Motors/AP_StepperController.cpp
     AP_SUBGROUPINFO(stepper_ctrl, "STPR_", 58, ParametersG2, AP_StepperController),
 
+    
     // @Group: AOUT_
     // @Path: ../libraries/AR_Motors/AP_StepperController.cpp
     AP_SUBGROUPINFO(analogoutput, "AOUT_", 59, ParametersG2, AP_AnalogOutput),
-
+    
     // @Group: DAC_
     // @Path: ../libraries/AR_Motors/AP_StepperController.cpp
     AP_SUBGROUPINFO(dac, "DAC_", 60, ParametersG2, AP_DAC),
-
+    
+    // @Group: SDRV_
+    // @Path: ../libraries/AP_StepperDriver/AP_StepperDriver.cpp
+    AP_SUBGROUPINFO(stepper_driver, "SDRV_", 61, ParametersG2, AP_StepperDriver),
     AP_GROUPEND
 };
 

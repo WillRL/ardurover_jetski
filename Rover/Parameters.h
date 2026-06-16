@@ -309,6 +309,7 @@ public:
 
     // Motor library
     AP_StepperController stepper_ctrl;
+    AP_StepperDriver stepper_driver;
     AP_DAC dac;
     AP_AnalogOutput analogoutput;
     AP_MotorsUGV motors;

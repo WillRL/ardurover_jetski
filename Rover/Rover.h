@@ -46,6 +46,7 @@
 #include <AP_Follow/AP_Follow_config.h>
 #include <AP_ExternalControl/AP_ExternalControl_config.h>
 #include <AR_Motors/AP_StepperController.h>
+#include <AP_StepperDriver/AP_StepperDriver.h>
 #if AP_EXTERNAL_CONTROL_ENABLED
 #include "AP_ExternalControl_Rover.h"
 #endif

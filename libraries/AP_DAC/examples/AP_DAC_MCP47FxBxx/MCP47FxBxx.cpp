@@ -68,7 +68,7 @@ int delay = 10; // 10
 int count = 0;
 void loop()
 {   
-    voltage = sin(10*AP_HAL::millis()/1000.0f) * 2.5 + 2.5;
+    voltage = sinF(10*AP_HAL::millis()/1000.0f) * 2.5 + 2.5;
     chan0 = dac.set_voltage(0, voltage);
     // hal.scheduler->delay(delay);
     chan1 = dac.set_voltage(1, voltage);

@@ -86,6 +86,13 @@ const AP_Param::GroupInfo AP_StepperController::var_info[] = {
     // @Values: -180..180
     // @User: Standard
     AP_GROUPINFO("TRIM", 10, AP_StepperController, _trim, 0),
+
+    // @Param: DEADBAND
+    // @DisplayName: DEADBAND
+    // @Description: Deadband for steering in degrees. Any error within this range will be ignored.
+    // @Values: 0..180
+    // @User: Standard
+    AP_GROUPINFO("DEADBAND", 11, AP_StepperController, _deadband, 0),
     
     AP_GROUPEND
 };
@@ -110,16 +117,20 @@ void AP_StepperController::update(){
     float curr_theta = wrap_360(encoder_frontend.theta * _rad2deg + _trim) - 180.0f;
     // float curr_omega = encoder_frontend.omega * _rad2deg;
     // float dt = AP_HAL::millis() -  _prev_time; 
-    
+
 
     // Requested angle from autopilot is for the steering angle. Convert this to stepper motor angle (Or encoder angle if the encoder is not on stepper shaft)
     float setpoint_pos = MAX(MIN(setpoint * _gear_ratio, 180), -180); // 180 is the hard limit as this only supports absolute encoders. (Not taking into wrapping of the angle)
-    float stepper_min_max = _min_max * (float) _gear_ratio;
+    float stepper_min_max = _min_max * (float) abs(_gear_ratio);
     setpoint_pos = MAX(MIN(setpoint_pos, stepper_min_max), -stepper_min_max);
 
     // Obtain control signal.
     // Position control
     float error_pos = setpoint_pos - curr_theta;
+    if (abs(error_pos) < _deadband) {
+        error_pos = 0;
+    }
+    
     float control_signal = _pid_angle.get_pid(error_pos, 1);
 
     // Velocity control
@@ -129,39 +140,47 @@ void AP_StepperController::update(){
     // Adjust velocity based of acceleration from control (Gives us a slew rate)
     // float control_signal = curr_omega + alpha * dt;
     control_signal = MAX(MIN(control_signal, _max_freq), -_max_freq);
-    
+    bool sign = signbit(control_signal);
+    if (sign != _prev_direction){
+        hal.gpio->pinMode(_stepper_direction_pin, HAL_GPIO_OUTPUT);
+        hal.gpio->write(_stepper_direction_pin, sign);
+        _prev_direction = sign;
+    }
+
     // Write direction and frequency.
-    hal.gpio->pinMode(_stepper_direction_pin, HAL_GPIO_OUTPUT);
-    hal.gpio->write(_stepper_direction_pin, signbit(control_signal));
     uint32_t motor_mask = SRV_Channels::get_output_channel_mask(SRV_Channel::k_steering);
     hal.rcout->set_freq(motor_mask, abs(control_signal));
-    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "control_signal: %0.3f", control_signal);
+    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "STEERING: %f %f", curr_theta, setpoint_pos);
+    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "FREQ: %f", control_signal);
 
 
     _prev_time = AP_HAL::millis(); // Update the previous time to the current time
-    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "set_om: %0.3f set_al: %0.3f ct: %0.3f", setpoint_omega, alpha, control_signal);
-    // GCS_SEND_TEXT(MAV_SEVERITY_DEBUG, "err_pos: %0.3f err_ome: %0.3f", error_pos, error_omega);
 }
+
 
     
 void AP_StepperController::arm(){
-    hal.gpio->pinMode(_en_pin, HAL_GPIO_OUTPUT);
-    hal.gpio->write(_en_pin, 0);
+    if (!_lua_override){
+        hal.gpio->pinMode(_en_pin, HAL_GPIO_OUTPUT);
+        hal.gpio->write(abs(_en_pin), signbit((int8_t) -_en_pin));
+    }
 }
 
 void AP_StepperController::disarm(){
-    hal.gpio->pinMode(_en_pin, HAL_GPIO_OUTPUT);
-    hal.gpio->write(_en_pin, 1);
+    if (!_lua_override){
+        hal.gpio->pinMode(_en_pin, HAL_GPIO_OUTPUT);
+        hal.gpio->write(abs(_en_pin), signbit((int8_t) _en_pin));
+    }
 }
 
 void AP_StepperController::_lua_arm(){
-    _lua_override = true;
     arm();
+    _lua_override = true;
 }
 
 void AP_StepperController::_lua_disarm(){
-    _lua_override = true;   
     disarm();
+    _lua_override = true;   
 }
 
 void AP_StepperController::_lua_relinquish_control(){

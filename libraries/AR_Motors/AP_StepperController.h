@@ -28,7 +28,7 @@ class AP_StepperController {
         void _lua_disarm();
         void _lua_relinquish_control();
         
-        // Speed is defined as a PWM. Every rising edge is a single step, so a PWM 
+        // Speed is defined as a PWM. Every rising edge is a single step, so the frequency of the PWM controls the speed.
         void update();
 
         static const struct AP_Param::GroupInfo var_info[];
@@ -46,12 +46,14 @@ class AP_StepperController {
         PID _pid_angle;
         PID _pid_rate;
         AP_Int32 _trim;
+        AP_Float _deadband;
         float _prev_control = 0;
         float _prev_time = 0; // Previous time.
         float _rad2deg = (180/M_PI);
         AP_Int8 _en_pin;
         int8_t _en_state;
         bool _lua_override = false;
+        bool _prev_direction = 0;
         static AP_StepperController *_singleton;
 };
 

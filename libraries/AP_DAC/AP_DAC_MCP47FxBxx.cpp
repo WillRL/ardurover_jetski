@@ -186,6 +186,7 @@ bool AP_DAC_MCP47FxBxx::set_voltage(uint8_t chan, float voltage) {
     if(_write_register_16(_dac_vol_reg[chan], voltage_bits)){
         return true;
     }
+    GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Failed to set non-volatile voltage on channel %u", chan);
     return false;
 }
 
